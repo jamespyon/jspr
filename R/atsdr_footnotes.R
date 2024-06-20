@@ -2,18 +2,17 @@
 
 atsdr_footnotes <- function(i = 0) {
 
-  key_table <- data.frame(
-    index = 1:10,
-    symbol = c("*", "†", "‡", "§", "¶", "**", "††", "‡‡", "§§", "¶¶")
-  )
+  key_vctr <- c("*", "†", "‡", "§", "¶", "**", "††", "‡‡", "§§", "¶¶")
 
-  if(symbol == 0) {
+  if(sum(i == 0:10) == 0) {stop("i must be within [0:10]")}
 
-    (key_table$symbol)
+  if(i == 0) {
+
+    print(key_vctr)
 
   } else {
 
-    (key_table$symbol[index==i,])
+    print(key_vctr[as.numeric(i)])
 
   }
 
