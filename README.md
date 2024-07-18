@@ -1,3 +1,3 @@
 # jspr
 
-A personal package containing necessary custom functions used on a daily basis.
+A personal package containing useful custom functions used on a daily basis in the life of an ATSDR EI human.
