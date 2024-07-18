@@ -1,16 +1,16 @@
 # example ----
 
-random_numbers_15 <- rexp(n = 18, rate = 1)
-random_numbers_40 <- rexp(n = 40, rate = 1)
-goodmix_data <- data.frame(results = random_numbers_15, nd = random_numbers_15<0.5)
-allnd_data <- data.frame(results = random_numbers_15, nd = TRUE)
-nond_data <- data.frame(results = random_numbers_15, nd = FALSE)
-only2_data <- data.frame(results = random_numbers_15, nd = random_numbers_15<1.65)
-bigmix_data <- data.frame(results = random_numbers_40, nd = random_numbers_40<1)
+#random_numbers_15 <- rexp(n = 18, rate = 1)
+#random_numbers_40 <- rexp(n = 40, rate = 1)
+#goodmix_data <- data.frame(results = random_numbers_15, nd = random_numbers_15<0.5)
+#allnd_data <- data.frame(results = random_numbers_15, nd = TRUE)
+#nond_data <- data.frame(results = random_numbers_15, nd = FALSE)
+#only2_data <- data.frame(results = random_numbers_15, nd = random_numbers_15<1.65)
+#bigmix_data <- data.frame(results = random_numbers_40, nd = random_numbers_40<1)
 
-data <- goodmix_data
-obs <- data$results
-cen <- data$nd
+#data <- goodmix_data
+#obs <- data$results
+#cen <- data$nd
 
 # function ----
 calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE) {
