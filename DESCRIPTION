@@ -2,10 +2,18 @@ Package: jspr
 Title: Useful Functions for ATSDR Projects
 Version: 0.0.0.9000
 Authors@R: 
-    person("James", "Pyon", , "pyonjs@hotmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0008-1740-178X"))
+  c(person("James", "Pyon", , "pyonjs@hotmail.com", role = c("aut", "cre"))
+  )
 Description: A personal package containing useful custom functions used on a daily basis in the life of an ATSDR EI human.
 License: MIT + file LICENSE
+URL: https://github.com/jamespyon/jspr
+Imports:
+  EnvStats,
+  NADA,
+  boot
+Suggests:
+  stats,
+  var
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
