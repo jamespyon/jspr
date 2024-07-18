@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_epc.R
 \name{calculate_epc}
 \alias{calculate_epc}
-\title{Calculate EPC in R}
+\title{Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023).}
 \usage{
 calculate_epc(
   obs = NULL,
@@ -27,7 +27,7 @@ calculate_epc(
 A data.frame class object.
 }
 \description{
-Calculate EPC in R
+Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023).
 }
 \examples{
 results <- rexp(n = 15, rate = 1)
