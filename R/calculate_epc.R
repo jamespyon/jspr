@@ -12,6 +12,7 @@
 #' @export
 #'
 #' @examples
+#' set.seed(20240406)
 #' results <- rexp(n = 15, rate = 1)
 #' nondetects <- results<0.8
 #' calculate_epc(obs = results, cen = nondetects)
