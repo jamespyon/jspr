@@ -97,7 +97,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
       dataCensoringSummary <- NADA::censummary(obs, cen)
       pexceed <- dataCensoringSummary$limits$pexceed
 
-      if(length(pexceed) == 1 | var(pexceed) == 0) {
+      if(length(pexceed) == 1 | stats::var(pexceed) == 0) {
 
         distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf = 0.90)
         df$function_used <- "lognormalBootstrap_95ucl"

@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_epc.R
 \name{calculate_epc}
 \alias{calculate_epc}
-\title{Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023).}
+\title{Calculate Exposure Point Concentrations (EPCs)}
 \usage{
 calculate_epc(
   obs = NULL,
