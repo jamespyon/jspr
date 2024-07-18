@@ -464,5 +464,5 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 }
 
 # test ----
-calculate_epc(data$results, data$nd)
+#calculate_epc(data$results, data$nd)
 
