@@ -123,7 +123,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
     # mean confidence interval
     mean_uci <- signif(df$retval, sigfig)
-    df$mean_ci <- paste0("(", prettyNum(mean_lci, big.mark = ","), "—", prettyNum(mean_uci, big.mark = ","), ")")
+    df$mean_ci <- paste0("(", prettyNum(mean_lci, big.mark = ","), "–", prettyNum(mean_uci, big.mark = ","), ")")
 
   } else { #between 8 and 19
 
@@ -206,14 +206,14 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
         mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
         mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(mean_lci, big.mark = ","), "—", prettyNum(mean_uci, big.mark = ","), ")")
+        df$mean_ci <- paste0(" (", prettyNum(mean_lci, big.mark = ","), "–", prettyNum(mean_uci, big.mark = ","), ")")
 
         df$dist_sd <- distData[["parameters"]][["sd"]]
         df$dist_median <- stats::qnorm(0.5, df$dist_mean, df$dist_sd)
 
         firstQuartile <- signif(stats::qnorm(0.25, df$dist_mean, df$dist_sd), sigfig)
         thirdQuartile <- signif(stats::qnorm(0.75, df$dist_mean, df$dist_sd), sigfig)
-        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","),"—", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","),"–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedNormalDistribution <- TRUE
 
@@ -282,7 +282,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
         firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$dist_mean, cv), sigfig)
         thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$dist_mean, cv), sigfig)
-        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","), "—", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedLognormalDistribution <- TRUE
 
