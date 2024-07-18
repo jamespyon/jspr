@@ -1,9 +1,7 @@
-# EPC Calculator ----
 
-# This is a wrapper
-#input should be a single media, single chem
 
-calc_epc <- function(data, obs, cen, testForNormal = TRUE, useDefaultSeed = TRUE) {
+
+calculate_epc <- function(data, obs, cen, testForNormal = TRUE, useDefaultSeed = TRUE) {
 
   #options
   num_sig <- 4 # number of significant digits
