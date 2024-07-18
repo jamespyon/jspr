@@ -12,8 +12,7 @@ Imports:
   NADA,
   boot
 Suggests:
-  stats,
-  var
+  stats
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
