@@ -1,4 +1,6 @@
-#' Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023).
+#' Calculate Exposure Point Concentrations (EPCs)
+#'
+#'@description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023).
 #'
 #' @param obs A numeric vector
 #' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
