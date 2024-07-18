@@ -8,11 +8,14 @@ Description: A personal package containing useful custom functions used on a dai
 License: MIT + file LICENSE
 URL: https://github.com/jamespyon/jspr
 Imports:
-  EnvStats,
-  NADA,
-  boot
+    EnvStats,
+    NADA,
+    boot,
+    stats
 Suggests:
-  stats
+    testthat (>= 3.0.0)
+    NADA2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Config/testthat/edition: 3
