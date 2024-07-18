@@ -1,10 +1,10 @@
 Package: jspr
-Title: Interesting Functions for ATSDR
+Title: Useful Functions for ATSDR Projects
 Version: 0.0.0.9000
 Authors@R: 
     person("James", "Pyon", , "pyonjs@hotmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0008-1740-178X"))
-Description: A personal package containing necessary custom functions used on a daily basis at ATSDR.
+Description: A personal package containing useful custom functions used on a daily basis in the life of an ATSDR EI human.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
