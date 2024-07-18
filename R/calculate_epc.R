@@ -1,18 +1,20 @@
-# example ----
+#' Calculate EPC in R
+#'
+#' @param obs A numeric vector
+#' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
+#' @param sigfig A number for significant figures for the function. Default is 4.
+#' @param testForNormal Logical. If you want to test for normal distribution of your obs.
+#' @param useDefaultSeed Logical. TRUE uses my custom seed.
+#'
+#' @return A data.frame class object.
+#' @export
+#'
+#' @examples
+#' results <- rexp(n = 15, rate = 1)
+#' nondetects <- results<0.8
+#' calculate_epc(obs = results, cen = nondetects)
+#'
 
-#random_numbers_15 <- rexp(n = 18, rate = 1)
-#random_numbers_40 <- rexp(n = 40, rate = 1)
-#goodmix_data <- data.frame(results = random_numbers_15, nd = random_numbers_15<0.5)
-#allnd_data <- data.frame(results = random_numbers_15, nd = TRUE)
-#nond_data <- data.frame(results = random_numbers_15, nd = FALSE)
-#only2_data <- data.frame(results = random_numbers_15, nd = random_numbers_15<1.65)
-#bigmix_data <- data.frame(results = random_numbers_40, nd = random_numbers_40<1)
-
-#data <- goodmix_data
-#obs <- data$results
-#cen <- data$nd
-
-# function ----
 calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE) {
 
   #pre-processing
@@ -462,7 +464,3 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
   return(df)
 
 }
-
-# test ----
-#calculate_epc(data$results, data$nd)
-
