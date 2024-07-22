@@ -7,7 +7,7 @@
 <!-- badges: end -->
 
 A personal package containing useful custom functions used on a daily
-basis in the life of an human in ATSDR Exposure Investigations.
+basis in the life of a unlikely human working with environmental data.
 
 ## Installation
 
