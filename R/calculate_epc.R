@@ -100,7 +100,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
       if(length(pexceed) == 1 | stats::var(pexceed) == 0) {
 
-        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 3000, conf = 0.90)
+        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf = 0.90)
         df$function_used <- "lognormalBootstrap_95ucl"
 
       } else {
@@ -115,7 +115,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
     } else {
 
-      bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 3000)
+      bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
       df$retval <- boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[5]]
       mean_lci <- signif(boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[4]], sigfig)
       df$function_used <- "bootstrap_95ucl"
