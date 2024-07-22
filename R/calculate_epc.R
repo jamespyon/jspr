@@ -100,7 +100,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
       if(length(pexceed) == 1 | stats::var(pexceed) == 0) {
 
-        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf = 0.90)
+        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 3000, conf = 0.90)
         df$function_used <- "lognormalBootstrap_95ucl"
 
       } else {
@@ -115,7 +115,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
     } else {
 
-      bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
+      bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 3000)
       df$retval <- boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[5]]
       mean_lci <- signif(boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[4]], sigfig)
       df$function_used <- "bootstrap_95ucl"
@@ -369,9 +369,8 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
       testValues <- stats::pnorm(0, mean = distData$parameters[[1]], sd = distData$parameters[[2]])
       if(testZ <= testValues){ #not a good fit to normal distribution, falling back to next distribution
 
-        testForNormal <- FALSE
         #make recursive function call
-        return(calculate_epc(obs, cen, testForNormal, useDefaultSeed))
+        return(calculate_epc(obs, cen, testForNormal = FALSE, useDefaultSeed = useDefaultSeed))
 
       }
 
