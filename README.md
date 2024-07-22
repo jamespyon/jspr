@@ -1,14 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# jspr
+# jspr (Pronounced *ˈja-spər*/*ˈdʒæspə*)
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-(Pronounced *ˈja-spər*/*ˈdʒæspə*). A personal package containing useful
-custom functions used on a daily basis in the life of an human in ATSDR
-Exposure Investigations.
+A personal package containing useful custom functions used on a daily
+basis in the life of an human in ATSDR Exposure Investigations.
 
 ## Installation
 
@@ -29,14 +28,25 @@ Here are some features of the *jspr* R package.
 Taken and reformatted from *atsdrepc* R package, this function
 calculates the exposure point concentration used in health consultations
 or other projects. The original uses a shiny application that requires
-an xlsx template input that is complicated with R. This function helps
+an .xlsx template input that is complicated with R. This function helps
 makes the process easier for those who know what to do. It requires an
 input of observations (numeric vector) and censoring (logical vector)
-and is best run together with *dplyr* verb functions *group_by*() and
-*summarise*(). For output, retval is epc.
+and is best run together with *dplyr* verb functions *group_by()* and
+*summarise()*. For output, retval is epc.
 
 ``` r
 library(jspr)
+
+set.seed(20240406)
+
+#example of individual inputs
+results <- rexp(n = 16, rate = 1)
+nondetects <- results<0.8
+
+calculate_epc(obs = results, cen = nondetects)$retval
+#> [1] 1.490921
+
+#example of dplyr verbs with dataframe
 library(tidyverse)
 #> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 #> ✔ dplyr     1.1.4     ✔ readr     2.1.5
@@ -49,16 +59,6 @@ library(tidyverse)
 #> ✖ dplyr::lag()    masks stats::lag()
 #> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
-set.seed(20240406)
-
-#example of individual inputs
-results <- rexp(n = 16, rate = 1)
-nondetects <- results<0.8
-
-calculate_epc(obs = results, cen = nondetects)$retval
-#> [1] 1.490921
-
-#example of dplyr verbs with dataframe
 data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
   group_by(group) %>%
   summarise(epc = calculate_epc(obs = results, cen = nondetects)$retval)
