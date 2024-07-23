@@ -18,12 +18,14 @@ ChatGPT:
 > ranging from red and brown to yellow and green. Its formation occurs
 > through the slow crystallization of silica-rich fluids within
 > sedimentary rocks or volcanic deposits, a process that typically spans
-> extended geological timescales. , jasper is classified as a
-> microcrystalline quartz, distinguished by its dense, fine-grained
-> structure which contributes to its durability and polishability. This
-> mineral’s historical significance stems from its enduring use in
-> decorative arts and jewelry across civilizations, owing to its
-> aesthetic appeal and cultural symbolism.
+> extended geological timescales.
+
+> Geologically, jasper is classified as a microcrystalline quartz,
+> distinguished by its dense, fine-grained structure which contributes
+> to its durability and polishability. This mineral’s historical
+> significance stems from its enduring use in decorative arts and
+> jewelry across civilizations, owing to its aesthetic appeal and
+> cultural symbolism.
 
 > Metaphysically, jasper holds significance in esoteric practices,
 > believed to impart qualities of stability, grounding, and endurance.
