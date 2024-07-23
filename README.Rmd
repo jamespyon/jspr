@@ -31,7 +31,7 @@ This is how ChatGPT defines jasper when asked to make the definition of jasper l
 
 *In contemporary contexts, jasper continues to find application in lapidary work and industrial uses due to its hardness and attractive color variations. Its presence in geological formations provides insights into ancient environments and processes of mineral formation, contributing to broader scientific understanding and exploration of Earth's natural history.*
 
-This package has nothing to do this rocks. This is a personal package containing useful custom functions used on a daily basis in the life of a unlikely human working with environmental data.
+This package has nothing to do with rocks. This is a personal package containing useful custom functions used on a daily basis in the life of a unlikely human working with environmental data.
 
 ## **Installation**
 
