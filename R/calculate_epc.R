@@ -4,6 +4,7 @@
 #'
 #' @param obs A numeric vector
 #' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
+#' @param conf.level A numeric vector from 0 to 1 for confidence level. Default is 0.90 for computing 95UCL.
 #' @param sigfig A number for significant figures for the function. Default is 4.
 #' @param testForNormal Logical. If you want to test for normal distribution of your obs.
 #' @param useDefaultSeed Logical. TRUE uses my custom seed.
@@ -18,7 +19,7 @@
 #' calculate_epc(obs = results, cen = nondetects)
 #'
 
-calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE) {
+calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE) {
 
   #pre-processing
   obs_count <- length(obs)
@@ -100,12 +101,12 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
       if(length(pexceed) == 1 | stats::var(pexceed) == 0) {
 
-        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf = 0.90)
+        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf = conf.level)
         df$function_used <- "lognormalBootstrap_95ucl"
 
       } else {
 
-        distData <- EnvStats::enparCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap", n.bootstraps = 5000, conf = 0.90)
+        distData <- EnvStats::enparCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap", n.bootstraps = 5000, conf = conf.level)
         df$function_used <- "bootstrap_95ucl"
 
       }
@@ -116,8 +117,8 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
     } else {
 
       bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
-      df$retval <- boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[5]]
-      mean_lci <- signif(boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[4]], sigfig)
+      df$retval <- boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[5]]
+      mean_lci <- signif(boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[4]], sigfig)
       df$function_used <- "bootstrap_95ucl"
 
     }
@@ -192,12 +193,12 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
         if(nondetect_count > 0){
 
           distData <- EnvStats::enormCensored(obs, cen, ci = TRUE, ci.type = "upper", ci.method = "normal.approx")
-          ci_90 <- EnvStats::enormCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = 0.90)
+          ci_90 <- EnvStats::enormCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = conf.level)
 
         } else {
 
           distData <- EnvStats::enorm(obs, ci = TRUE, ci.type = "upper")
-          ci_90 <- EnvStats::enorm(obs, ci = TRUE, ci.type = "two-sided", conf.level = 0.90)
+          ci_90 <- EnvStats::enorm(obs, ci = TRUE, ci.type = "two-sided", conf.level = conf.level)
 
         }
 
@@ -225,12 +226,12 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
         if(nondetect_count > 0){
 
           distData <- EnvStats::egammaAltCensored(obs, cen, ci = TRUE, ci.type = "upper", ci.method = "normal.approx")
-          ci_90 <- EnvStats::egammaAltCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = 0.90)
+          ci_90 <- EnvStats::egammaAltCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = conf.level)
 
         } else {
 
           distData <- EnvStats::egammaAlt(obs, ci = TRUE, ci.type = "upper", ci.method = "normal.approx")
-          ci_90 <- EnvStats::egammaAlt(obs, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = 0.90)
+          ci_90 <- EnvStats::egammaAlt(obs, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = conf.level)
 
         }
 
@@ -261,12 +262,12 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
         if(nondetect_count > 0){
 
           distData <- EnvStats::elnormAltCensored(obs, cen, ci = TRUE,ci.type = "upper", ci.method = "cox")
-          ci_90 <- EnvStats::elnormAltCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "cox", conf.level = 0.90)
+          ci_90 <- EnvStats::elnormAltCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "cox", conf.level = conf.level)
 
         } else {
 
           distData <- EnvStats::elnormAlt(obs, ci = TRUE, ci.type = "upper", ci.method = "cox")
-          ci_90 <- EnvStats::elnormAlt(obs, ci = TRUE, ci.type = "two-sided", ci.method = "cox", conf.level = 0.90)
+          ci_90 <- EnvStats::elnormAlt(obs, ci = TRUE, ci.type = "two-sided", ci.method = "cox", conf.level = conf.level)
 
         }
 
