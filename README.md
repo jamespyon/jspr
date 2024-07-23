@@ -42,8 +42,8 @@ Earth’s natural history.*
 **This package has nothing to do with rocks.**
 
 This is a personal package containing some useful functions used on a
-daily basis in the life of a unlikely human working with environmental
-data.
+daily basis in the life of a unlikely human who happens to be a
+statistician working with environmental data.
 
 ## **Installation**
 

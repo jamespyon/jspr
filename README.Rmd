@@ -33,7 +33,7 @@ The following is a "long and boring" definition of the word jasper from ChatGPT:
 
 **This package has nothing to do with rocks.**
 
-This is a personal package containing some useful functions used on a daily basis in the life of a unlikely human working with environmental data.
+This is a personal package containing some useful functions used on a daily basis in the life of a unlikely human who happens to be a statistician working with environmental data.
 
 ## **Installation**
 
