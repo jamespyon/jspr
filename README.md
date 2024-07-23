@@ -39,7 +39,7 @@ insights into ancient environments and processes of mineral formation,
 contributing to broader scientific understanding and exploration of
 Earth’s natural history.*
 
-This package has nothing to do this rocks. This is a personal package
+This package has nothing to do with rocks. This is a personal package
 containing useful custom functions used on a daily basis in the life of
 a unlikely human working with environmental data.
 
