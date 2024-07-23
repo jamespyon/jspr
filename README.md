@@ -13,31 +13,32 @@ What is the definition of jasper?
 The following is a “long and boring” definition of the word jasper from
 ChatGPT:
 
-*Jasper is a cryptocrystalline variety of quartz characterized by its
-opaque appearance and intricate patterns, commonly exhibiting hues
-ranging from red and brown to yellow and green. Its formation occurs
-through the slow crystallization of silica-rich fluids within
-sedimentary rocks or volcanic deposits, a process that typically spans
-extended geological timescales.*
+> Jasper is a cryptocrystalline variety of quartz characterized by its
+> opaque appearance and intricate patterns, commonly exhibiting hues
+> ranging from red and brown to yellow and green. Its formation occurs
+> through the slow crystallization of silica-rich fluids within
+> sedimentary rocks or volcanic deposits, a process that typically spans
+> extended geological timescales.
 
-*Geologically, jasper is classified as a microcrystalline quartz,
-distinguished by its dense, fine-grained structure which contributes to
-its durability and polishability. This mineral’s historical significance
-stems from its enduring use in decorative arts and jewelry across
-civilizations, owing to its aesthetic appeal and cultural symbolism.*
+> Geologically, jasper is classified as a microcrystalline quartz,
+> distinguished by its dense, fine-grained structure which contributes
+> to its durability and polishability. This mineral’s historical
+> significance stems from its enduring use in decorative arts and
+> jewelry across civilizations, owing to its aesthetic appeal and
+> cultural symbolism.
 
-*Metaphysically, jasper holds significance in esoteric practices,
-believed to impart qualities of stability, grounding, and endurance.
-Different varieties of jasper are purported to exhibit distinct
-energetic properties, influencing its application in spiritual and
-holistic healing traditions.*
+> Metaphysically, jasper holds significance in esoteric practices,
+> believed to impart qualities of stability, grounding, and endurance.
+> Different varieties of jasper are purported to exhibit distinct
+> energetic properties, influencing its application in spiritual and
+> holistic healing traditions.
 
-*In contemporary contexts, jasper continues to find application in
-lapidary work and industrial uses due to its hardness and attractive
-color variations. Its presence in geological formations provides
-insights into ancient environments and processes of mineral formation,
-contributing to broader scientific understanding and exploration of
-Earth’s natural history.*
+> In contemporary contexts, jasper continues to find application in
+> lapidary work and industrial uses due to its hardness and attractive
+> color variations. Its presence in geological formations provides
+> insights into ancient environments and processes of mineral formation,
+> contributing to broader scientific understanding and exploration of
+> Earth’s natural history.
 
 **This package has nothing to do with rocks.**
 
