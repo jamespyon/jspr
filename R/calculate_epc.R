@@ -1,6 +1,6 @@
 #' Calculate Exposure Point Concentrations (EPCs)
 #'
-#'@description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023).
+#'@description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
 #'
 #' @param obs A numeric vector
 #' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
@@ -15,7 +15,7 @@
 #' @examples
 #' set.seed(20240406)
 #' results <- rexp(n = 15, rate = 1)
-#' nondetects <- results<0.8
+#' nondetects <- results<0.5
 #' calculate_epc(obs = results, cen = nondetects)
 #'
 
