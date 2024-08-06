@@ -42,16 +42,16 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
   # final output
   df <- data.frame(
     function_used = "",
-    epc = NA,
+    mean = NA,
+    sd = NA,
+    median = NA,
+    retval = NA,
     notes = "",
     qcontrol = "",
     warnings_errors = "",normal_dist = NA,
     lognorm_dist = NA,
     gamma_dist = NA,
     best_dist = "NA",
-    dist_mean = NA,
-    dist_sd = NA,
-    dist_median = NA,
     dist_iq = "NA",
     mean_ci = ""
   )
@@ -111,21 +111,23 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
       }
 
-      df$epc <- as.numeric(distData$interval$limits["Pct.UCL"])
-      mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
+      df$retval <- as.numeric(distData$interval$limits["Pct.UCL"])
+      df$mean <- as.numeric(distData$parameters["mean"])
+      df$mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
 
     } else {
 
       bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
-      df$epc <- boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[5]]
-      mean_lci <- signif(boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[4]], sigfig)
+      df$retval <- boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[5]]
+      df$mean <- mean(bootoutput$t)
+      df$mean_lci <- signif(boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[4]], sigfig)
       df$function_used <- "bootstrap_95ucl"
 
     }
 
     # mean confidence interval
-    mean_uci <- signif(df$epc, sigfig)
-    df$mean_ci <- paste0("(", prettyNum(mean_lci, big.mark = ","), "–", prettyNum(mean_uci, big.mark = ","), ")")
+    df$mean_uci <- signif(df$retval, sigfig)
+    df$mean_ci <- paste0("(", prettyNum(df$mean_lci, big.mark = ","), "–", prettyNum(df$mean_uci, big.mark = ","), ")")
 
   } else { #between 8 and 19
 
@@ -203,18 +205,18 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
         }
 
         df$function_used <- "normal_95ucl"
-        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
-        df$dist_mean <- distData[["parameters"]][["mean"]]
+        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
+        df$mean <- distData[["parameters"]][["mean"]]
 
-        mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
-        mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(mean_lci, big.mark = ","), "–", prettyNum(mean_uci, big.mark = ","), ")")
+        df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
+        df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
+        df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "–", prettyNum(df$mean_uci, big.mark = ","), ")")
 
-        df$dist_sd <- distData[["parameters"]][["sd"]]
-        df$dist_median <- stats::qnorm(0.5, df$dist_mean, df$dist_sd)
+        df$sd <- distData[["parameters"]][["sd"]]
+        df$median <- stats::qnorm(0.5, df$mean, df$sd)
 
-        firstQuartile <- signif(stats::qnorm(0.25, df$dist_mean, df$dist_sd), sigfig)
-        thirdQuartile <- signif(stats::qnorm(0.75, df$dist_mean, df$dist_sd), sigfig)
+        firstQuartile <- signif(stats::qnorm(0.25, df$mean, df$sd), sigfig)
+        thirdQuartile <- signif(stats::qnorm(0.75, df$mean, df$sd), sigfig)
         df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","),"–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedNormalDistribution <- TRUE
@@ -237,19 +239,19 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         df$function_used = "gamma_95ucl"
 
-        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
-        df$dist_mean <- distData[["parameters"]][["mean"]]
+        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
+        df$mean <- distData[["parameters"]][["mean"]]
 
-        mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
-        mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(mean_lci, big.mark = ","), "—", prettyNum(mean_uci, big.mark = ","), ")")
+        df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
+        df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
+        df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "—", prettyNum(df$mean_uci, big.mark = ","), ")")
 
         cv <- distData$parameters[[2]]
-        df$dist_sd <- df$dist_mean * cv
-        df$dist_median <- EnvStats::qgammaAlt(0.5, df$dist_mean, cv)
+        df$sd <- df$mean * cv
+        df$median <- EnvStats::qgammaAlt(0.5, df$mean, cv)
 
-        firstQuartile <- signif(EnvStats::qgammaAlt(0.25, df$dist_mean, cv), sigfig)
-        thirdQuartile <- signif(EnvStats::qgammaAlt(0.75, df$dist_mean, cv), sigfig)
+        firstQuartile <- signif(EnvStats::qgammaAlt(0.25, df$mean, cv), sigfig)
+        thirdQuartile <- signif(EnvStats::qgammaAlt(0.75, df$mean, cv), sigfig)
         df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","),"—", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedGammaDistribution <- TRUE
@@ -271,19 +273,19 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         }
 
-        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
-        df$dist_mean <- distData[["parameters"]][["mean"]]
+        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
+        df$mean <- distData[["parameters"]][["mean"]]
 
-        mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
-        mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(mean_lci, big.mark = ","), "—", prettyNum(mean_uci, big.mark = ","), ")")
+        df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
+        df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
+        df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "—", prettyNum(df$mean_uci, big.mark = ","), ")")
 
         cv <- distData$parameters[[2]]
-        df$dist_sd <- df$dist_mean * cv # Standard deviation, since it isn't directly reported
-        df$dist_median <- EnvStats::qlnormAlt(0.5, df$dist_mean, cv) # Median, since it isn't directly reported
+        df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
+        df$median <- EnvStats::qlnormAlt(0.5, df$mean, cv) # Median, since it isn't directly reported
 
-        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$dist_mean, cv), sigfig)
-        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$dist_mean, cv), sigfig)
+        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig)
+        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig)
         df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedLognormalDistribution <- TRUE
@@ -295,7 +297,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
       }
 
-      if (df$dist_mean < max_detected_value) {
+      if (df$mean < max_detected_value) {
 
         success <- TRUE
         break
