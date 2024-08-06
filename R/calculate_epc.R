@@ -45,7 +45,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
     mean = NA,
     sd = NA,
     median = NA,
-    retval = NA,
+    epc = NA,
     notes = "",
     qcontrol = "",
     warnings_errors = "",normal_dist = NA,
@@ -111,14 +111,14 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
       }
 
-      df$retval <- as.numeric(distData$interval$limits["Pct.UCL"])
+      df$epc <- as.numeric(distData$interval$limits["Pct.UCL"])
       df$mean <- as.numeric(distData$parameters["mean"])
       df$mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
 
     } else {
 
       bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
-      df$retval <- boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[5]]
+      df$epc <- boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[5]]
       df$mean <- mean(bootoutput$t)
       df$mean_lci <- signif(boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[4]], sigfig)
       df$function_used <- "bootstrap_95ucl"
@@ -126,7 +126,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
     }
 
     # mean confidence interval
-    df$mean_uci <- signif(df$retval, sigfig)
+    df$mean_uci <- signif(df$epc, sigfig)
     df$mean_ci <- paste0("(", prettyNum(df$mean_lci, big.mark = ","), "–", prettyNum(df$mean_uci, big.mark = ","), ")")
 
   } else { #between 8 and 19
@@ -205,7 +205,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
         }
 
         df$function_used <- "normal_95ucl"
-        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
+        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
         df$mean <- distData[["parameters"]][["mean"]]
 
         df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
@@ -239,7 +239,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         df$function_used = "gamma_95ucl"
 
-        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
+        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
         df$mean <- distData[["parameters"]][["mean"]]
 
         df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
@@ -273,7 +273,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         }
 
-        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
+        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
         df$mean <- distData[["parameters"]][["mean"]]
 
         df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
