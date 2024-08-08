@@ -1,6 +1,6 @@
 #' Calculate Exposure Point Concentrations (EPCs)
 #'
-#'@description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023).
+#'@description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
 #'
 #' @param obs A numeric vector
 #' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
@@ -15,7 +15,7 @@
 #' @examples
 #' set.seed(20240406)
 #' results <- rexp(n = 15, rate = 1)
-#' nondetects <- results<0.8
+#' nondetects <- results<0.5
 #' calculate_epc(obs = results, cen = nondetects)
 #'
 
@@ -45,7 +45,9 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
     mean = NA,
     sd = NA,
     median = NA,
-    retval = NA,
+    epc = NA,
+    mean_lci = NA,
+    mean_uci = NA,
     notes = "",
     qcontrol = "",
     warnings_errors = "",normal_dist = NA,
@@ -111,23 +113,22 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
       }
 
-      df$retval <- as.numeric(distData$interval$limits["Pct.UCL"])
+      df$epc <- as.numeric(distData$interval$limits["Pct.UCL"])
       df$mean <- as.numeric(distData$parameters["mean"])
       df$mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
 
     } else {
 
       bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
-      df$retval <- boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[5]]
+      df$epc <- boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[5]]
       df$mean <- mean(bootoutput$t)
-      df$mean_lci <- signif(boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[4]], sigfig)
+      df$mean_lci <- signif(boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[4]], sigfig)
       df$function_used <- "bootstrap_95ucl"
 
     }
 
     # mean confidence interval
-    df$mean_uci <- signif(df$retval, sigfig)
-    df$mean_ci <- paste0("(", prettyNum(df$mean_lci, big.mark = ","), "–", prettyNum(df$mean_uci, big.mark = ","), ")")
+    df$mean_uci <- signif(df$epc, sigfig)
 
   } else { #between 8 and 19
 
@@ -205,12 +206,11 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
         }
 
         df$function_used <- "normal_95ucl"
-        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
+        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
         df$mean <- distData[["parameters"]][["mean"]]
 
         df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
         df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "–", prettyNum(df$mean_uci, big.mark = ","), ")")
 
         df$sd <- distData[["parameters"]][["sd"]]
         df$median <- stats::qnorm(0.5, df$mean, df$sd)
@@ -239,12 +239,11 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         df$function_used = "gamma_95ucl"
 
-        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
+        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
         df$mean <- distData[["parameters"]][["mean"]]
 
         df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
         df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "—", prettyNum(df$mean_uci, big.mark = ","), ")")
 
         cv <- distData$parameters[[2]]
         df$sd <- df$mean * cv
@@ -273,12 +272,11 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         }
 
-        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
+        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
         df$mean <- distData[["parameters"]][["mean"]]
 
         df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
         df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "—", prettyNum(df$mean_uci, big.mark = ","), ")")
 
         cv <- distData$parameters[[2]]
         df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
@@ -465,6 +463,8 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
     df$notes = message_breaks(df$notes, "See this dataset's quality control flag for further information about the calculated EPC.")
 
   }
+
+  df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "—", prettyNum(df$mean_uci, big.mark = ","), ")")
 
   return(df)
 
