@@ -7,6 +7,7 @@
 calculate_epc(
   obs = NULL,
   cen = NULL,
+  conf.level = 0.9,
   sigfig = 4,
   testForNormal = TRUE,
   useDefaultSeed = TRUE
@@ -17,7 +18,9 @@ calculate_epc(
 
 \item{cen}{A logical vector pertaining to censoring of obs. TRUE if obs is censored.}
 
-\item{sigfig}{A number for significant figures for the function. Default is 4.}
+\item{conf.level}{A numeric vector from 0 to 1 for confidence level. Default is 0.90 for computing 95UCL.}
+
+\item{sigfig}{A numeric value for the number of significant figures for the outputs of the function. Default is 4.}
 
 \item{testForNormal}{Logical. If you want to test for normal distribution of your obs.}
 
@@ -25,14 +28,32 @@ calculate_epc(
 }
 \value{
 A data.frame class object.
+\itemize{
+\item \code{function_used} the character string representing the type of calculation used for the EPC
+\item \code{mean} numeric value of the estimated mean based on \code{function_used}
+\item \code{sd} numeric value of the estimated standard deviation based on \code{function_used}
+\item \code{median} numeric value of the estimated median based on \code{function_used}, if available
+\item \code{epc} numeric value of the EPC based on \code{function_used}
+\item \code{mean_lci} numeric value of the lower confidence interval based on \code{conf.level}, based on \code{function_used}
+\item \code{mean_uci} numeric value of the upper confidence interval based on \code{conf.level}, based on \code{function_used}. Technically the EPC
+\item \code{notes} character string of the underlying process that outputted the returned values
+\item \code{qcontrol}
+\item \code{warnings_errors}
+\item \code{normal_dist} numeric value of the Cox-value for normal distribution
+\item \code{lognorm_dist} numeric value of the Cox-value for log-normal distribution
+\item \code{gamma_dist} numeric value of the Cox-value for gamma distribution
+\item \code{best_dist}
+\item \code{dist_iqr} character string of the IQR (interquartile range, i.e. 25th and 75th percentile) of the distribution, if avaliable
+\item \code{mean_ci} character string of the confidence interval based on \code{conf.level}
+}
 }
 \description{
-Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023).
+Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
 }
 \examples{
 set.seed(20240406)
 results <- rexp(n = 15, rate = 1)
-nondetects <- results<0.8
+nondetects <- results<0.5
 calculate_epc(obs = results, cen = nondetects)
 
 }
