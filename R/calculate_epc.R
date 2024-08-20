@@ -5,11 +5,28 @@
 #' @param obs A numeric vector
 #' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
 #' @param conf.level A numeric vector from 0 to 1 for confidence level. Default is 0.90 for computing 95UCL.
-#' @param sigfig A number for significant figures for the function. Default is 4.
+#' @param sigfig A numeric value for the number of significant figures for the outputs of the function. Default is 4.
 #' @param testForNormal Logical. If you want to test for normal distribution of your obs.
 #' @param useDefaultSeed Logical. TRUE uses my custom seed.
 #'
 #' @return A data.frame class object.
+#' * `function_used` the character string representing the type of calculation used for the EPC
+#' * `mean` numeric value of the estimated mean based on `function_used`
+#' * `sd` numeric value of the estimated standard deviation based on `function_used`
+#' * `median` numeric value of the estimated median based on `function_used`, if available
+#' * `epc` numeric value of the EPC based on `function_used`
+#' * `mean_lci` numeric value of the lower confidence interval based on `conf.level`, based on `function_used`
+#' * `mean_uci` numeric value of the upper confidence interval based on `conf.level`, based on `function_used`. Technically the EPC
+#' * `notes` character string of the underlying process that outputted the returned values
+#' * `qcontrol`
+#' * `warnings_errors`
+#' * `normal_dist` numeric value of the Cox-value for normal distribution
+#' * `lognorm_dist` numeric value of the Cox-value for log-normal distribution
+#' * `gamma_dist` numeric value of the Cox-value for gamma distribution
+#' * `best_dist`
+#' * `dist_iqr` character string of the IQR (interquartile range, i.e. 25th and 75th percentile) of the distribution, if avaliable
+#' * `mean_ci` character string of the confidence interval based on `conf.level`
+#'
 #' @export
 #'
 #' @examples
@@ -50,11 +67,12 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
     mean_uci = NA,
     notes = "",
     qcontrol = "",
-    warnings_errors = "",normal_dist = NA,
+    warnings_errors = "",
+    normal_dist = NA,
     lognorm_dist = NA,
     gamma_dist = NA,
     best_dist = "NA",
-    dist_iq = "NA",
+    dist_iqr = "NA",
     mean_ci = ""
   )
 
@@ -217,7 +235,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         firstQuartile <- signif(stats::qnorm(0.25, df$mean, df$sd), sigfig)
         thirdQuartile <- signif(stats::qnorm(0.75, df$mean, df$sd), sigfig)
-        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","),"–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedNormalDistribution <- TRUE
 
@@ -251,7 +269,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         firstQuartile <- signif(EnvStats::qgammaAlt(0.25, df$mean, cv), sigfig)
         thirdQuartile <- signif(EnvStats::qgammaAlt(0.75, df$mean, cv), sigfig)
-        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","),"—", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"—", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedGammaDistribution <- TRUE
 
@@ -284,7 +302,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig)
         thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig)
-        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedLognormalDistribution <- TRUE
 
