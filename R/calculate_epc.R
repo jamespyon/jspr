@@ -1,24 +1,41 @@
 #' Calculate Exposure Point Concentrations (EPCs)
 #'
-#'@description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023).
+#'@description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
 #'
 #' @param obs A numeric vector
 #' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
-#' @param sigfig A number for significant figures for the function. Default is 4.
-#' @param testForNormal Logical. If you want to test for normal distribution of your obs.
-#' @param useDefaultSeed Logical. TRUE uses my custom seed.
+#' @param conf.level A numeric vector from 0 to 1 for confidence level. Default is 0.90 for computing 95UCL.
+#' @param sigfig A numeric value for the number of significant figures for the outputs of the function. Default is 4.
+#' @param testForNormal Logical. If you want to test for normal distribution of your obs. Default is TRUE
+#' @param useDefaultSeed Logical. The Default TRUE uses my custom seed.
 #'
 #' @return A data.frame class object.
+#' * `function_used`: the character string representing the type of calculation used for the EPC.
+#' * `mean`: numeric value of the estimated mean based on `function_used`.
+#' * `sd`: numeric value of the estimated standard deviation based on `function_used`.
+#' * `median`: numeric value of the estimated median based on `function_used`, if available.
+#' * `epc`: numeric value of the EPC based on `function_used`.
+#' * `mean_lci`: numeric value of the lower confidence interval based on `conf.level`, based on `function_used`.
+#' * `mean_uci`: numeric value of the upper confidence interval based on `conf.level`, based on `function_used`. Technically the EPC.
+#' * `notes`: character string of the underlying process that outputted the returned values.
+#' * `qcontrol`: character string of the potential errors related to the data in relation to the returned values.
+#' * `normal_dist`: numeric value of the Cox-value for normal distribution.
+#' * `lognorm_dist`: numeric value of the Cox-value for log-normal distribution.
+#' * `gamma_dist`: numeric value of the Cox-value for gamma distribution.
+#' * `best_dist`: either Normal, Gamma, or Lognormal, depending on what is chosen.
+#' * `dist_iqr`: character string of the IQR (interquartile range, i.e. 25th and 75th percentile) of the distribution, if avaliable.
+#' * `mean_ci`: character string of the confidence interval based on `conf.level`.
+#'
 #' @export
 #'
 #' @examples
 #' set.seed(20240406)
 #' results <- rexp(n = 15, rate = 1)
-#' nondetects <- results<0.8
+#' nondetects <- results<0.5
 #' calculate_epc(obs = results, cen = nondetects)
 #'
 
-calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE) {
+calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE) {
 
   #pre-processing
   obs_count <- length(obs)
@@ -41,17 +58,19 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
   # final output
   df <- data.frame(
     function_used = "",
-    retval = NA,
+    mean = NA,
+    sd = NA,
+    median = NA,
+    epc = NA,
+    mean_lci = NA,
+    mean_uci = NA,
     notes = "",
     qcontrol = "",
-    warnings_errors = "",normal_dist = NA,
+    normal_dist = NA,
     lognorm_dist = NA,
     gamma_dist = NA,
     best_dist = "NA",
-    dist_mean = NA,
-    dist_sd = NA,
-    dist_median = NA,
-    dist_iq = "NA",
+    dist_iqr = "NA",
     mean_ci = ""
   )
 
@@ -59,19 +78,19 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
   if(detected_count == 0){ #if not detected, we use maximum censoring limit
 
-    df$retval <- signif(max(obs), sigfig)
+    df$epc <- signif(max(obs), sigfig)
     df$function_used <- "no_detections"
     df$notes <- "This dataset did not contain any detected results, so an EPC could not be calculated. Use the maximum censoring limit."
 
   } else if(detected_count < 4) { #if less than 4 detected, we use max detected
 
-    df$retval <- max_detected_value
+    df$epc <- max_detected_value
     df$function_used <- "max_less_than_4_detections"
     df$notes <- message_breaks(df$notes, "This dataset contained less than four detections, so the EPC is equal to the maximum detected value.")
 
   } else if(nondetect_percent >= 0.8){ #if equal/more than 80% non-detected, we use max detected
 
-    df$retval <- max_detected_value
+    df$epc <- max_detected_value
     df$function_used <- "max_80_percent_or_more_non_detects"
     df$notes <- message_breaks(df$notes, "This dataset contained 80% or more non-detects, so the EPC is equal to the maximum detected value.")
 
@@ -81,13 +100,13 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
   if(obs_count < 8){ #if less than 8 obs, we use the max
 
-    df$retval <- max_detected_value
+    df$epc <- max_detected_value
     df$function_used <- "max_less_than_8_records"
     df$notes <- message_breaks(df$notes, "This dataset contained less than eight records, so the EPC is equal to the maximum detected value.")
 
   } else if(unique_detected_count < 3){ #if less than 3 unique detected, we use the max
 
-    df$retval <- max_detected_value
+    df$epc <- max_detected_value
     df$function_used <- "max_fewer_than_3_unique_detections"
     df$notes <- message_breaks(df$notes, "This dataset contained fewer than three unique detected values, so the EPC is equal to the maximum detected value.")
 
@@ -100,31 +119,32 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
       if(length(pexceed) == 1 | stats::var(pexceed) == 0) {
 
-        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf = 0.90)
+        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf = conf.level)
         df$function_used <- "lognormalBootstrap_95ucl"
 
       } else {
 
-        distData <- EnvStats::enparCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap", n.bootstraps = 5000, conf = 0.90)
+        distData <- EnvStats::enparCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap", n.bootstraps = 5000, conf = conf.level)
         df$function_used <- "bootstrap_95ucl"
 
       }
 
-      df$retval <- as.numeric(distData$interval$limits["Pct.UCL"])
-      mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
+      df$epc <- as.numeric(distData$interval$limits["Pct.UCL"])
+      df$mean <- as.numeric(distData$parameters["mean"])
+      df$mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
 
     } else {
 
       bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
-      df$retval <- boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[5]]
-      mean_lci <- signif(boot::boot.ci(bootoutput, conf = 0.90, type = "perc")$percent[[4]], sigfig)
+      df$epc <- boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[5]]
+      df$mean <- mean(bootoutput$t)
+      df$mean_lci <- signif(boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[4]], sigfig)
       df$function_used <- "bootstrap_95ucl"
 
     }
 
     # mean confidence interval
-    mean_uci <- signif(df$retval, sigfig)
-    df$mean_ci <- paste0("(", prettyNum(mean_lci, big.mark = ","), "–", prettyNum(mean_uci, big.mark = ","), ")")
+    df$mean_uci <- signif(df$epc, sigfig)
 
   } else { #between 8 and 19
 
@@ -192,29 +212,28 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
         if(nondetect_count > 0){
 
           distData <- EnvStats::enormCensored(obs, cen, ci = TRUE, ci.type = "upper", ci.method = "normal.approx")
-          ci_90 <- EnvStats::enormCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = 0.90)
+          ci_90 <- EnvStats::enormCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = conf.level)
 
         } else {
 
           distData <- EnvStats::enorm(obs, ci = TRUE, ci.type = "upper")
-          ci_90 <- EnvStats::enorm(obs, ci = TRUE, ci.type = "two-sided", conf.level = 0.90)
+          ci_90 <- EnvStats::enorm(obs, ci = TRUE, ci.type = "two-sided", conf.level = conf.level)
 
         }
 
         df$function_used <- "normal_95ucl"
-        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
-        df$dist_mean <- distData[["parameters"]][["mean"]]
+        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
+        df$mean <- distData[["parameters"]][["mean"]]
 
-        mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
-        mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(mean_lci, big.mark = ","), "–", prettyNum(mean_uci, big.mark = ","), ")")
+        df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
+        df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
 
-        df$dist_sd <- distData[["parameters"]][["sd"]]
-        df$dist_median <- stats::qnorm(0.5, df$dist_mean, df$dist_sd)
+        df$sd <- distData[["parameters"]][["sd"]]
+        df$median <- stats::qnorm(0.5, df$mean, df$sd)
 
-        firstQuartile <- signif(stats::qnorm(0.25, df$dist_mean, df$dist_sd), sigfig)
-        thirdQuartile <- signif(stats::qnorm(0.75, df$dist_mean, df$dist_sd), sigfig)
-        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","),"–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        firstQuartile <- signif(stats::qnorm(0.25, df$mean, df$sd), sigfig)
+        thirdQuartile <- signif(stats::qnorm(0.75, df$mean, df$sd), sigfig)
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedNormalDistribution <- TRUE
 
@@ -225,31 +244,30 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
         if(nondetect_count > 0){
 
           distData <- EnvStats::egammaAltCensored(obs, cen, ci = TRUE, ci.type = "upper", ci.method = "normal.approx")
-          ci_90 <- EnvStats::egammaAltCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = 0.90)
+          ci_90 <- EnvStats::egammaAltCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = conf.level)
 
         } else {
 
           distData <- EnvStats::egammaAlt(obs, ci = TRUE, ci.type = "upper", ci.method = "normal.approx")
-          ci_90 <- EnvStats::egammaAlt(obs, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = 0.90)
+          ci_90 <- EnvStats::egammaAlt(obs, ci = TRUE, ci.type = "two-sided", ci.method = "normal.approx", conf.level = conf.level)
 
         }
 
         df$function_used = "gamma_95ucl"
 
-        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
-        df$dist_mean <- distData[["parameters"]][["mean"]]
+        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
+        df$mean <- distData[["parameters"]][["mean"]]
 
-        mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
-        mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(mean_lci, big.mark = ","), "—", prettyNum(mean_uci, big.mark = ","), ")")
+        df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
+        df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
 
         cv <- distData$parameters[[2]]
-        df$dist_sd <- df$dist_mean * cv
-        df$dist_median <- EnvStats::qgammaAlt(0.5, df$dist_mean, cv)
+        df$sd <- df$mean * cv
+        df$median <- EnvStats::qgammaAlt(0.5, df$mean, cv)
 
-        firstQuartile <- signif(EnvStats::qgammaAlt(0.25, df$dist_mean, cv), sigfig)
-        thirdQuartile <- signif(EnvStats::qgammaAlt(0.75, df$dist_mean, cv), sigfig)
-        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","),"—", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        firstQuartile <- signif(EnvStats::qgammaAlt(0.25, df$mean, cv), sigfig)
+        thirdQuartile <- signif(EnvStats::qgammaAlt(0.75, df$mean, cv), sigfig)
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"—", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedGammaDistribution <- TRUE
 
@@ -261,29 +279,28 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
         if(nondetect_count > 0){
 
           distData <- EnvStats::elnormAltCensored(obs, cen, ci = TRUE,ci.type = "upper", ci.method = "cox")
-          ci_90 <- EnvStats::elnormAltCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "cox", conf.level = 0.90)
+          ci_90 <- EnvStats::elnormAltCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "cox", conf.level = conf.level)
 
         } else {
 
           distData <- EnvStats::elnormAlt(obs, ci = TRUE, ci.type = "upper", ci.method = "cox")
-          ci_90 <- EnvStats::elnormAlt(obs, ci = TRUE, ci.type = "two-sided", ci.method = "cox", conf.level = 0.90)
+          ci_90 <- EnvStats::elnormAlt(obs, ci = TRUE, ci.type = "two-sided", ci.method = "cox", conf.level = conf.level)
 
         }
 
-        df$retval <- distData[["interval"]][["limits"]][["UCL"]]
-        df$dist_mean <- distData[["parameters"]][["mean"]]
+        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
+        df$mean <- distData[["parameters"]][["mean"]]
 
-        mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
-        mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
-        df$mean_ci <- paste0(" (", prettyNum(mean_lci, big.mark = ","), "—", prettyNum(mean_uci, big.mark = ","), ")")
+        df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
+        df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
 
         cv <- distData$parameters[[2]]
-        df$dist_sd <- df$dist_mean * cv # Standard deviation, since it isn't directly reported
-        df$dist_median <- EnvStats::qlnormAlt(0.5, df$dist_mean, cv) # Median, since it isn't directly reported
+        df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
+        df$median <- EnvStats::qlnormAlt(0.5, df$mean, cv) # Median, since it isn't directly reported
 
-        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$dist_mean, cv), sigfig)
-        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$dist_mean, cv), sigfig)
-        df$dist_iq <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig)
+        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig)
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedLognormalDistribution <- TRUE
 
@@ -294,7 +311,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
       }
 
-      if (df$dist_mean < max_detected_value) {
+      if (df$mean < max_detected_value) {
 
         success <- TRUE
         break
@@ -319,7 +336,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
           if(is.na(max_stat)){
 
-            df$retval <- max_detected_value
+            df$epc <- max_detected_value
             df$function_used <- "max_data_did_not_fit_any_distribution"
 
             default_error_message <- paste(df$notes,"error or did not fit any model")
@@ -350,7 +367,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
         } else {
 
-          df$retval <- max_detected_value
+          df$epc <- max_detected_value
           df$function_used <- "max_mean_greater_than_max_detect"
           df$qcontrol <- message_breaks(df$qcontrol, "The model estimated mean was greater than the maximum detected value. Tried using other distributions but all distributions failed to have the model estimated mean be less than the max detected value. Reverting to maximum.")
 
@@ -381,14 +398,14 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
   ros_df <- as.data.frame(NADA::ros(obs, as.logical(cen)))
   average_value <- mean(ros_df$modeled, na.rm = TRUE)
 
-  if(!is.na(df$retval) & substr(df$function_used, 1, 3) != "max"){
+  if(!is.na(df$epc) & substr(df$function_used, 1, 3) != "max"){
 
-    if(df$retval > max_detected_value){
+    if(df$epc > max_detected_value){
 
       if (obs_count >= 20) {
 
         df$qcontrol <- message_breaks(df$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was larger than the maximum detected value. Because the dataset contains 20 or more records, the maximum value was used as the EPC instead of the 95UCL. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
-        df$retval <- max_detected_value
+        df$epc <- max_detected_value
         df$function_used <- "max_95ucl_larger_than_max_value"
 
       } else if (obs_count < 20 & obs_count >= 8) {
@@ -397,13 +414,13 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
 
       }
 
-    } else if(df$retval < average_value){
+    } else if(df$epc < average_value){
 
       df$qcontrol <- message_breaks(df$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was less than the average value of this dataset. As a result, the maximum was used as the EPC. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
-      df$retval <- max_detected_value
+      df$epc <- max_detected_value
       df$function_used <- "max_95ucl_less_than_average_value"
 
-    } else if(df$retval > (3*average_value)){
+    } else if(df$epc > (3*average_value)){
 
       df$qcontrol <- message_breaks(df$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was more than three times the average value of this dataset. The 95UCL was used as the EPC for this dataset but should be verified. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
 
@@ -412,7 +429,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
   }
 
   #Check for case where called functions returned NaN or Inf
-  if(is.na(df$retval) || is.nan(df$retval) || is.infinite(df$retval)){
+  if(is.na(df$epc) || is.nan(df$epc) || is.infinite(df$epc)){
 
     df$function_used <- "EPC_not_calculated_due_to_NaN_or_Inf"
   }
@@ -462,6 +479,8 @@ calculate_epc <- function(obs = NULL, cen = NULL, sigfig = 4, testForNormal = TR
     df$notes = message_breaks(df$notes, "See this dataset's quality control flag for further information about the calculated EPC.")
 
   }
+
+  df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "—", prettyNum(df$mean_uci, big.mark = ","), ")")
 
   return(df)
 
