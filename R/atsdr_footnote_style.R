@@ -1,6 +1,6 @@
 #Footnotes based on ATSDR Guidance
 
-atsdr_footnotes <- function(i = 0) {
+atsdr_footnote_style <- function(i = 0) {
 
   key_vctr <- c("*", "†", "‡", "§", "¶")
 
