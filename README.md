@@ -74,10 +74,6 @@ It requires an input of observations (numeric vector) and censoring
 `group_by()` and `summarise()`. For output, you can call for `epc`.
 
 ``` r
-library(jspr)
-
-set.seed(20240406)
-
 #example of individual inputs
 results <- rexp(n = 16, rate = 1)
 nondetects <- results<0.8
@@ -87,16 +83,6 @@ calculate_epc(obs = results, cen = nondetects)$epc
 
 #example of dplyr verbs with dataframe
 library(tidyverse)
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.4     ✔ readr     2.1.5
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.1
-#> ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-#> ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
-#> ✔ purrr     1.0.2     
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
   group_by(group) %>%
