@@ -13,7 +13,7 @@ Imports:
     boot,
     stats
 Suggests:
-    testthat,
+    testthat (>= 3.0.0),
     NADA2,
     tidyverse
 Encoding: UTF-8
