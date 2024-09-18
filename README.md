@@ -74,14 +74,14 @@ It requires an input of observations (numeric vector) and censoring
 `group_by()` and `summarise()`. For output, you can call for `epc`.
 
 ``` r
-#example of individual inputs
+# example of individual inputs
 results <- rexp(n = 16, rate = 1)
 nondetects <- results<0.8
 
 calculate_epc(obs = results, cen = nondetects)$epc
 #> [1] 1.490921
 
-#example of dplyr verbs with dataframe
+# example of dplyr verbs with dataframe
 library(tidyverse)
 
 data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
