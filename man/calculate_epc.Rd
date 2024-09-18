@@ -22,29 +22,28 @@ calculate_epc(
 
 \item{sigfig}{A numeric value for the number of significant figures for the outputs of the function. Default is 4.}
 
-\item{testForNormal}{Logical. If you want to test for normal distribution of your obs.}
+\item{testForNormal}{Logical. If you want to test for normal distribution of your obs. Default is TRUE}
 
-\item{useDefaultSeed}{Logical. TRUE uses my custom seed.}
+\item{useDefaultSeed}{Logical. The Default TRUE uses my custom seed.}
 }
 \value{
 A data.frame class object.
 \itemize{
-\item \code{function_used} the character string representing the type of calculation used for the EPC
-\item \code{mean} numeric value of the estimated mean based on \code{function_used}
-\item \code{sd} numeric value of the estimated standard deviation based on \code{function_used}
-\item \code{median} numeric value of the estimated median based on \code{function_used}, if available
-\item \code{epc} numeric value of the EPC based on \code{function_used}
-\item \code{mean_lci} numeric value of the lower confidence interval based on \code{conf.level}, based on \code{function_used}
-\item \code{mean_uci} numeric value of the upper confidence interval based on \code{conf.level}, based on \code{function_used}. Technically the EPC
-\item \code{notes} character string of the underlying process that outputted the returned values
-\item \code{qcontrol}
-\item \code{warnings_errors}
-\item \code{normal_dist} numeric value of the Cox-value for normal distribution
-\item \code{lognorm_dist} numeric value of the Cox-value for log-normal distribution
-\item \code{gamma_dist} numeric value of the Cox-value for gamma distribution
-\item \code{best_dist}
-\item \code{dist_iqr} character string of the IQR (interquartile range, i.e. 25th and 75th percentile) of the distribution, if avaliable
-\item \code{mean_ci} character string of the confidence interval based on \code{conf.level}
+\item \code{function_used}: the character string representing the type of calculation used for the EPC.
+\item \code{mean}: numeric value of the estimated mean based on \code{function_used}.
+\item \code{sd}: numeric value of the estimated standard deviation based on \code{function_used}.
+\item \code{median}: numeric value of the estimated median based on \code{function_used}, if available.
+\item \code{epc}: numeric value of the EPC based on \code{function_used}.
+\item \code{mean_lci}: numeric value of the lower confidence interval based on \code{conf.level}, based on \code{function_used}.
+\item \code{mean_uci}: numeric value of the upper confidence interval based on \code{conf.level}, based on \code{function_used}. Technically the EPC.
+\item \code{notes}: character string of the underlying process that outputted the returned values.
+\item \code{qcontrol}: character string of the potential errors related to the data in relation to the returned values.
+\item \code{normal_dist}: numeric value of the Cox-value for normal distribution.
+\item \code{lognorm_dist}: numeric value of the Cox-value for log-normal distribution.
+\item \code{gamma_dist}: numeric value of the Cox-value for gamma distribution.
+\item \code{best_dist}: either Normal, Gamma, or Lognormal, depending on what is chosen.
+\item \code{dist_iqr}: character string of the IQR (interquartile range, i.e. 25th and 75th percentile) of the distribution, if avaliable.
+\item \code{mean_ci}: character string of the confidence interval based on \code{conf.level}.
 }
 }
 \description{
