@@ -15,6 +15,7 @@ Imports:
 Suggests:
     testthat (>= 3.0.0),
     NADA2,
+    EnvStats,
     tidyverse
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
