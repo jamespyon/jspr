@@ -157,9 +157,9 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
       df$epc <- boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[5]]
       df$mean <- mean(bootoutput$t)
       df$mean_lci <- signif(boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[4]], sigfig)
-      df$median <- median(bootoutput$t)
-      firstQuartile <- signif(quantile(bootoutput$t, 0.25), sigfig)
-      thirdQuartile <- signif(quantile(bootoutput$t, 0.75), sigfig)
+      df$median <- stats::median(bootoutput$t)
+      firstQuartile <- signif(stats::quantile(bootoutput$t, 0.25), sigfig)
+      thirdQuartile <- signif(stats::quantile(bootoutput$t, 0.75), sigfig)
       df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
       df$function_used <- "bootstrap_95ucl"
 
