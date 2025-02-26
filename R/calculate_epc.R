@@ -132,12 +132,35 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
       df$mean <- as.numeric(distData$parameters["mean"])
       df$mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
 
+      if(df$function_used == "lognormalBootstrap_95ucl") {
+        cv <- distData$parameters[[2]]
+        df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
+        df$median <- EnvStats::qlnormAlt(0.5, df$mean, cv) # Median, since it isn't directly reported
+
+        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig)
+        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig)
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+      }
+      if(df$function_used == "bootstrap_95ucl") {
+        cv <- distData$parameters[[2]]
+        df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
+        df$median <- EnvStats::qlnormAlt(0.5, df$mean, cv) # keep as normal dist for now
+
+        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig) # keep as normal dist for now
+        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig) # keep as normal dist for now
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+      }
+
     } else {
 
       bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
       df$epc <- boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[5]]
       df$mean <- mean(bootoutput$t)
       df$mean_lci <- signif(boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[4]], sigfig)
+      df$median <- median(bootoutput$t)
+      firstQuartile <- signif(quantile(bootoutput$t, 0.25), sigfig)
+      thirdQuartile <- signif(quantile(bootoutput$t, 0.75), sigfig)
+      df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
       df$function_used <- "bootstrap_95ucl"
 
     }
