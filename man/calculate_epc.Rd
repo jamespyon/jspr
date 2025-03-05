@@ -50,8 +50,14 @@ A data.frame class object.
 Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
 }
 \examples{
-results <- rexp(n = 15, rate = 1)
+results <- rexp(n = 16, rate = 1)
 nondetects <- results<0.5
 calculate_epc(obs = results, cen = nondetects)
+
+library(tidyverse)
+
+data.frame(results, nondetects, group = rep(c("A", "B"), 8)) |>
+  group_by(group) |>
+  summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
 
 }

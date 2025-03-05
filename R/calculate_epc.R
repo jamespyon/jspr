@@ -29,9 +29,15 @@
 #' @export
 #'
 #' @examples
-#' results <- rexp(n = 15, rate = 1)
+#' results <- rexp(n = 16, rate = 1)
 #' nondetects <- results<0.5
 #' calculate_epc(obs = results, cen = nondetects)
+#'
+#' library(tidyverse)
+#'
+#' data.frame(results, nondetects, group = rep(c("A", "B"), 8)) |>
+#'   group_by(group) |>
+#'   summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
 #'
 
 calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE) {
@@ -139,7 +145,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig)
         thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig)
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
       }
       if(df$function_used == "bootstrap_95ucl") {
         cv <- distData$parameters[[2]]
@@ -148,7 +154,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig) # keep as normal dist for now
         thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig) # keep as normal dist for now
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
       }
 
     } else {
@@ -160,7 +166,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
       df$median <- stats::median(bootoutput$t)
       firstQuartile <- signif(stats::quantile(bootoutput$t, 0.25), sigfig)
       thirdQuartile <- signif(stats::quantile(bootoutput$t, 0.75), sigfig)
-      df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+      df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
       df$function_used <- "bootstrap_95ucl"
 
     }
@@ -255,7 +261,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         firstQuartile <- signif(stats::qnorm(0.25, df$mean, df$sd), sigfig)
         thirdQuartile <- signif(stats::qnorm(0.75, df$mean, df$sd), sigfig)
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedNormalDistribution <- TRUE
 
@@ -289,7 +295,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         firstQuartile <- signif(EnvStats::qgammaAlt(0.25, df$mean, cv), sigfig)
         thirdQuartile <- signif(EnvStats::qgammaAlt(0.75, df$mean, cv), sigfig)
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"—", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"\u2014", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedGammaDistribution <- TRUE
 
@@ -322,7 +328,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig)
         thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig)
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedLognormalDistribution <- TRUE
 
@@ -502,7 +508,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
   }
 
-  df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "—", prettyNum(df$mean_uci, big.mark = ","), ")")
+  df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "\u2014", prettyNum(df$mean_uci, big.mark = ","), ")")
 
   return(df)
 

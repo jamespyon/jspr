@@ -11,7 +11,9 @@ Imports:
     EnvStats,
     NADA,
     boot,
-    stats
+    stats,
+    flextable,
+    dplyr
 Suggests:
     testthat (>= 3.0.0),
     NADA2,
