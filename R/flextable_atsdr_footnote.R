@@ -34,8 +34,6 @@
 #'
 
 flextable_atsdr_footnote <- function(flextable, data) {
-  # flextable = example_dataset
-  # data = add_footnotes
 
   #find title footnotes
   title_fn <- data[is.na(data$i) & is.na(data$j),]
