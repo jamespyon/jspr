@@ -33,6 +33,9 @@
 #' nondetects <- results<0.5
 #' calculate_epc(obs = results, cen = nondetects)
 #'
+#' data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>% group_by(group) %>% summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
+#'
+#'
 
 calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE) {
 

@@ -54,4 +54,7 @@ results <- rexp(n = 15, rate = 1)
 nondetects <- results<0.5
 calculate_epc(obs = results, cen = nondetects)
 
+data.frame(results, nondetects, group = rep(c("A", "B"), 8)) \%>\% group_by(group) \%>\% summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
+
+
 }

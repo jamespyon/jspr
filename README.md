@@ -56,9 +56,24 @@ You can install the development version of jspr from
 devtools::install_github("jamespyon/jspr")
 ```
 
-## **Features**
+## **Highlighted Features!!**
 
-Here are some features of the *jspr* R package.
+Here are some of the main features of the *jspr* R package.
+
+### atsdr_footnote_symbol()
+
+This function produces the required footnote symbol depending on the
+index you want. The input is a single or multiple numbers. These aren’t
+ASCII friendly in R so this is useful to just have around.
+
+``` r
+library(jspr)
+
+atsdr_footnote_symbol(1)
+#> [1] "*"
+atsdr_footnote_symbol(1:10)
+#>  [1] "*"  "†"  "‡"  "§"  "¶"  "**" "††" "‡‡" "§§" "¶¶"
+```
 
 ### calculate_epc()
 
@@ -74,15 +89,37 @@ It requires an input of observations (numeric vector) and censoring
 `group_by()` and `summarise()`. For output, you can call for `epc`.
 
 ``` r
-# example of individual inputs
+library(jspr)
+
+#example of individual inputs
 results <- rexp(n = 16, rate = 1)
-nondetects <- results<0.8
+nondetects <- results<0.5
 
 calculate_epc(obs = results, cen = nondetects)$epc
-#> [1] 1.490921
+#> [1] 3.392521
 
-# example of dplyr verbs with dataframe
+#example of dplyr verbs with dataframe
 library(tidyverse)
+#> Warning: package 'tidyverse' was built under R version 4.4.3
+#> Warning: package 'ggplot2' was built under R version 4.4.3
+#> Warning: package 'tibble' was built under R version 4.4.3
+#> Warning: package 'tidyr' was built under R version 4.4.3
+#> Warning: package 'readr' was built under R version 4.4.3
+#> Warning: package 'purrr' was built under R version 4.4.3
+#> Warning: package 'dplyr' was built under R version 4.4.3
+#> Warning: package 'stringr' was built under R version 4.4.3
+#> Warning: package 'forcats' was built under R version 4.4.3
+#> Warning: package 'lubridate' was built under R version 4.4.3
+#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+#> ✔ dplyr     1.1.4     ✔ readr     2.1.5
+#> ✔ forcats   1.0.0     ✔ stringr   1.5.1
+#> ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+#> ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+#> ✔ purrr     1.0.4     
+#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+#> ✖ dplyr::filter() masks stats::filter()
+#> ✖ dplyr::lag()    masks stats::lag()
+#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
   group_by(group) %>%
@@ -90,6 +127,10 @@ data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
 #> # A tibble: 2 × 2
 #>   group   epc
 #>   <chr> <dbl>
-#> 1 A      1.99
-#> 2 B     36.9
+#> 1 A      6.93
+#> 2 B      3.08
 ```
+
+## **Other Features**
+
+*Coming soon to theaters near you~*

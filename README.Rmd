@@ -44,9 +44,21 @@ You can install the development version of jspr from [GitHub](https://github.com
 devtools::install_github("jamespyon/jspr")
 ```
 
-## **Features**
+## **Highlighted Features!!**
 
-Here are some features of the *jspr* R package.
+Here are some of the main features of the *jspr* R package.
+
+### atsdr_footnote_symbol()
+
+This function produces the required footnote symbol depending on the index you want. The input is a single or multiple numbers. These aren't ASCII friendly in R so this is useful to just have around.
+
+```{r atsdr_footnote_symbol_example}
+library(jspr)
+
+atsdr_footnote_symbol(1)
+atsdr_footnote_symbol(1:10)
+
+```
 
 ### calculate_epc()
 
@@ -54,14 +66,12 @@ Taken and reformatted from `atsdrepc` R package, this function calculates the ex
 
 It requires an input of observations (numeric vector) and censoring (logical vector) and is best run together with `dplyr` verb functions `group_by()` and `summarise()`. For output, you can call for `epc`.
 
-```{r example}
+```{r calculate_epc_example}
 library(jspr)
-
-set.seed(20240406)
 
 #example of individual inputs
 results <- rexp(n = 16, rate = 1)
-nondetects <- results<0.8
+nondetects <- results<0.5
 
 calculate_epc(obs = results, cen = nondetects)$epc
 
@@ -71,11 +81,13 @@ library(tidyverse)
 data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
   group_by(group) %>%
   summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
-  
 
 ```
 
 
+## **Other Features**
+
+*Coming soon to theaters near you~*
 
 
 
