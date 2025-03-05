@@ -18,7 +18,7 @@ atsdr_footnote_symbol <- function(i = 0) {
   output <- c()
 
   #footnote key
-  key_vctr <- c("*", "†", "‡", "§", "¶")
+  key_vctr <- c("*", "\u2020", "\u2021", "\u00a7", "\u00b6")
 
   n <- length(i)
 
