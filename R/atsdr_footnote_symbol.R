@@ -12,6 +12,7 @@
 #' atsdr_footnote_symbol(1)
 #' atsdr_footnote_symbol(1:10)
 #'
+#'
 atsdr_footnote_symbol <- function(i = 0) {
 
   #return output

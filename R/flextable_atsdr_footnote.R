@@ -14,8 +14,6 @@
 #'
 #' @return A flextable class object.
 #'
-#' @seealso [atsdr_footnote_symbol()]
-#'
 #' @examples
 #' library(tidyverse)
 #' library(flextable)
@@ -30,7 +28,7 @@
 #'   j = c(3, 3, 1, 2, NA)
 #' )
 #'
-#' example_dataset |> flextable_atsdr_footnote(add_footnotes)
+#' #example_dataset |> flextable_atsdr_footnote(add_footnotes)
 #'
 
 flextable_atsdr_footnote <- function(flextable, data) {

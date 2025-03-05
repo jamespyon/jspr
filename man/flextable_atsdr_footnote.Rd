@@ -38,9 +38,6 @@ add_footnotes <- data.frame(
   j = c(3, 3, 1, 2, NA)
 )
 
-example_dataset |> flextable_atsdr_footnote(add_footnotes)
+#example_dataset |> flextable_atsdr_footnote(add_footnotes)
 
-}
-\seealso{
-\code{\link[=atsdr_footnote_symbol]{atsdr_footnote_symbol()}}
 }
