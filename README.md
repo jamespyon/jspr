@@ -54,20 +54,6 @@ You can install the development version of jspr from
 ``` r
 # install.packages("devtools")
 devtools::install_github("jamespyon/jspr")
-#> Using GitHub PAT from the git credential store.
-#> Downloading GitHub repo jamespyon/jspr@HEAD
-#> 
-#> ── R CMD build ─────────────────────────────────────────────────────────────────
-#>          checking for file 'C:\Users\qae1\AppData\Local\Temp\1\RtmpUrP2fW\remotes65501a4957ad\jamespyon-jspr-3ba1a40/DESCRIPTION' ...  ✔  checking for file 'C:\Users\qae1\AppData\Local\Temp\1\RtmpUrP2fW\remotes65501a4957ad\jamespyon-jspr-3ba1a40/DESCRIPTION'
-#>       ─  preparing 'jspr':
-#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
-#>       ─  checking for LF line-endings in source and make files and shell scripts
-#>       ─  checking for empty or unneeded directories
-#>       ─  building 'jspr_0.1.2.tar.gz'
-#>      
-#> 
-#> Installing package into 'C:/Users/qae1/AppData/Local/Temp/1/RtmpsbRozf/temp_libpath4a3c43fc1add'
-#> (as 'lib' is unspecified)
 ```
 
 ## **Highlighted Features!!**
@@ -95,29 +81,13 @@ results <- rexp(n = 16, rate = 1)
 nondetects <- results<0.5
 
 calculate_epc(obs = results, cen = nondetects)$epc
-#> [1] 1.241415
 
 #example of dplyr verbs with dataframe
 library(tidyverse, quietly = TRUE)
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.4     ✔ readr     2.1.5
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.1
-#> ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-#> ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-#> ✔ purrr     1.0.4     
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
   group_by(group) %>%
   summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
-#> # A tibble: 2 × 2
-#>   group   epc
-#>   <chr> <dbl>
-#> 1 A      1.66
-#> 2 B      1.11
 ```
 
 ### atsdr_footnote_symbol()
@@ -130,9 +100,7 @@ great to type out in R so this is useful to just have around.
 library(jspr)
 
 atsdr_footnote_symbol(1)
-#> [1] "*"
 atsdr_footnote_symbol(1:10)
-#>  [1] "*"  "†"  "‡"  "§"  "¶"  "**" "††" "‡‡" "§§" "¶¶"
 ```
 
 ### flextable_atsdr_footnote()
@@ -145,11 +113,6 @@ footnotes for your flextable, rather than copy-and-pasting
 library(jspr)
 library(tidyverse, quietly = TRUE)
 library(flextable)
-#> 
-#> Attaching package: 'flextable'
-#> The following object is masked from 'package:purrr':
-#> 
-#>     compose
 
 example_dataset <- head(iris) |>
   flextable::flextable() |>
@@ -163,8 +126,6 @@ add_footnotes <- data.frame(
 
 example_dataset |> flextable_atsdr_footnote(add_footnotes)
 ```
-
-<img src="man/figures/README-flextable_atsdr_footnote_example-1.png" width="100%" />
 
 ## **Other Features**
 

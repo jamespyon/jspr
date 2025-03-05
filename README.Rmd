@@ -39,7 +39,7 @@ This is a personal package containing some useful functions used on a daily basi
 
 You can install the development version of jspr from [GitHub](https://github.com/) with:
 
-``` {r}
+``` r
 # install.packages("devtools")
 devtools::install_github("jamespyon/jspr")
 
@@ -55,7 +55,7 @@ Taken and reformatted from `atsdrepc` R package, this function calculates the ex
 
 It requires an input of observations (numeric vector) and censoring (logical vector) and is best run together with `dplyr` verb functions `group_by()` and `summarise()`. For output, you can call for `epc`.
 
-```{r calculate_epc_example}
+``` r 
 library(jspr)
 
 #example of individual inputs
@@ -77,7 +77,7 @@ data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
 
 This function produces the required footnote symbol depending on the index you want. The input is a single or multiple numbers. These aren't great to type out in R so this is useful to just have around.
 
-```{r atsdr_footnote_symbol_example}
+``` r
 library(jspr)
 
 atsdr_footnote_symbol(1)
@@ -89,7 +89,7 @@ atsdr_footnote_symbol(1:10)
 
 This is a wrapper function for `atsdr_footnote_symbol()` that produces footnotes for your flextable, rather than copy-and-pasting `flextable::footnote()` in an endless tidyverse piping loop.
 
-```{r flextable_atsdr_footnote_example}
+``` r 
 library(jspr)
 library(tidyverse, quietly = TRUE)
 library(flextable)
