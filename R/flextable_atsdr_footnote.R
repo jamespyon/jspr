@@ -1,29 +1,37 @@
 #' Flextable Footnotes based on ATSDR Style Manual (2019)
 #'
-#'@description Create flextable footnotes according to ATSDR Style Manual (2019). This is a wrapper for the atsdr_footnote_symbol() function.
+#' @description Create flextable footnotes according to ATSDR Style Manual (2019). This is a wrapper for the atsdr_footnote_symbol() function.
 #'
 #' @param flextable A flextable object.
 #' @param data A dataset with comment, i, j variables.
 #'
+#' @details
+#' The data argument needs a data.frame object that consists of three vectors labeled as comment, i, and j.
+#'
+#' The i and j column should be a single number which represent the row (i) and column (j) of where the footnote is placed. If both are NA, then the footnote will be for the title, or caption in flextable terms. If the row (i) is NA but not the column (j), then the footnote will be for the column name, or header in flextable terms.
+#'
+#' The comment column should be a character string and have the description for the footnote.
+#'
 #' @return A flextable class object.
 #'
-#' @export
+#' @seealso [atsdr_footnote_symbol()]
 #'
 #' @examples
 #' library(tidyverse)
 #' library(flextable)
 #'
-#'example_dataset <- head(iris) |>
-#'  flextable::flextable() |>
-#'  flextable::set_caption(flextable::as_paragraph("Iris Title"))
+#' example_dataset <- head(iris) |>
+#'   flextable::flextable() |>
+#'   flextable::set_caption(flextable::as_paragraph("Iris Title"))
 #'
-#'add_footnotes <- data.frame(
-#'  comment = c("column 3", "location (2,3)", "location (1,1)", "column 2", "title"),
-#'  i = c(NA, 2, 1, NA, NA),
-#'  j = c(3, 3, 1, 2, NA)
-#')
+#' add_footnotes <- data.frame(
+#'   comment = c("column 3", "location (2,3)", "location (1,1)", "column 2", "title"),
+#'   i = c(NA, 2, 1, NA, NA),
+#'   j = c(3, 3, 1, 2, NA)
+#' )
 #'
-#'example_dataset |> flextable_atsdr_footnote(add_footnotes)
+#' example_dataset |> flextable_atsdr_footnote(add_footnotes)
+#'
 
 flextable_atsdr_footnote <- function(flextable, data) {
   # flextable = example_dataset
@@ -155,3 +163,4 @@ flextable_atsdr_footnote <- function(flextable, data) {
   return(output)
 
 }
+

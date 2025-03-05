@@ -2,4 +2,3 @@
 
 export(atsdr_footnote_symbol)
 export(calculate_epc)
-export(flextable_atsdr_footnote)
