@@ -13,7 +13,7 @@
 #' library(tidyverse)
 #' library(flextable)
 #'
-#'example_dataset <- iris |>
+#'example_dataset <- head(iris) |>
 #'  flextable::flextable() |>
 #'  flextable::set_caption(flextable::as_paragraph("Iris Title"))
 #'

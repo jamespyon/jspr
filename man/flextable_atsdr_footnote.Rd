@@ -21,7 +21,7 @@ Create flextable footnotes according to ATSDR Style Manual (2019). This is a wra
 library(tidyverse)
 library(flextable)
 
-example_dataset <- iris |>
+example_dataset <- head(iris) |>
  flextable::flextable() |>
  flextable::set_caption(flextable::as_paragraph("Iris Title"))
 
