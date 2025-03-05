@@ -19,18 +19,17 @@ Create flextable footnotes according to ATSDR Style Manual (2019). This is a wra
 }
 \examples{
 library(tidyverse)
+library(flextable)
 
-example_dataset <- tibble::tribble(
-  ~col_1, ~col_2, ~col_3, ~col_4,
-  "1,1", "1,2", "1,3", "1,4",
-  "2,1", "2,2", "2,3", "2,4",
-  "3,1", "3,2", "3,3", "3,4",
-  "4,1", "4,2", "4,3", "4,4"
-) \%>\% flextable::flextable() \%>\%
-   flextable::set_caption(flextable::as_paragraph("Title"))
+example_dataset <- iris |>
+ flextable::flextable() |>
+ flextable::set_caption(flextable::as_paragraph("Iris Title"))
 
 add_footnotes <- data.frame(
-comment = c("column 3", "location (2,3)", "location (1,1)", "column 2", "title"), i = c(NA, 2, 1, NA, NA), j = c(3, 3, 1, 2, NA))
+ comment = c("column 3", "location (2,3)", "location (1,1)", "column 2", "title"),
+ i = c(NA, 2, 1, NA, NA),
+ j = c(3, 3, 1, 2, NA)
+)
 
-example_dataset \%>\% flextable_atsdr_footnote(add_footnotes)
+example_dataset |> flextable_atsdr_footnote(add_footnotes)
 }
