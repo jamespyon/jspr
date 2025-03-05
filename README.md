@@ -54,6 +54,20 @@ You can install the development version of jspr from
 ``` r
 # install.packages("devtools")
 devtools::install_github("jamespyon/jspr")
+#> Using GitHub PAT from the git credential store.
+#> Downloading GitHub repo jamespyon/jspr@HEAD
+#> 
+#> ── R CMD build ─────────────────────────────────────────────────────────────────
+#>          checking for file 'C:\Users\qae1\AppData\Local\Temp\1\RtmpUrP2fW\remotes65501a4957ad\jamespyon-jspr-3ba1a40/DESCRIPTION' ...  ✔  checking for file 'C:\Users\qae1\AppData\Local\Temp\1\RtmpUrP2fW\remotes65501a4957ad\jamespyon-jspr-3ba1a40/DESCRIPTION'
+#>       ─  preparing 'jspr':
+#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
+#>       ─  checking for LF line-endings in source and make files and shell scripts
+#>       ─  checking for empty or unneeded directories
+#>       ─  building 'jspr_0.1.2.tar.gz'
+#>      
+#> 
+#> Installing package into 'C:/Users/qae1/AppData/Local/Temp/1/RtmpsbRozf/temp_libpath4a3c43fc1add'
+#> (as 'lib' is unspecified)
 ```
 
 ## **Highlighted Features!!**
@@ -81,10 +95,10 @@ results <- rexp(n = 16, rate = 1)
 nondetects <- results<0.5
 
 calculate_epc(obs = results, cen = nondetects)$epc
-#> [1] 1.770186
+#> [1] 1.241415
 
 #example of dplyr verbs with dataframe
-library(tidyverse)
+library(tidyverse, quietly = TRUE)
 #> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 #> ✔ dplyr     1.1.4     ✔ readr     2.1.5
 #> ✔ forcats   1.0.0     ✔ stringr   1.5.1
@@ -102,8 +116,8 @@ data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
 #> # A tibble: 2 × 2
 #>   group   epc
 #>   <chr> <dbl>
-#> 1 A      2.96
-#> 2 B     68.5
+#> 1 A      1.66
+#> 2 B      1.11
 ```
 
 ### atsdr_footnote_symbol()
@@ -129,7 +143,7 @@ footnotes for your flextable, rather than copy-and-pasting
 
 ``` r
 library(jspr)
-library(tidyverse)
+library(tidyverse, quietly = TRUE)
 library(flextable)
 #> 
 #> Attaching package: 'flextable'

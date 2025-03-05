@@ -39,9 +39,10 @@ This is a personal package containing some useful functions used on a daily basi
 
 You can install the development version of jspr from [GitHub](https://github.com/) with:
 
-``` r
+``` {r}
 # install.packages("devtools")
 devtools::install_github("jamespyon/jspr")
+
 ```
 
 ## **Highlighted Features!!**
@@ -64,7 +65,7 @@ nondetects <- results<0.5
 calculate_epc(obs = results, cen = nondetects)$epc
 
 #example of dplyr verbs with dataframe
-library(tidyverse)
+library(tidyverse, quietly = TRUE)
 
 data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
   group_by(group) %>%
@@ -90,7 +91,7 @@ This is a wrapper function for `atsdr_footnote_symbol()` that produces footnotes
 
 ```{r flextable_atsdr_footnote_example}
 library(jspr)
-library(tidyverse)
+library(tidyverse, quietly = TRUE)
 library(flextable)
 
 example_dataset <- head(iris) |>
