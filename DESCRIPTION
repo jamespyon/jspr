@@ -12,7 +12,8 @@ Imports:
     NADA,
     boot,
     stats,
-    flextable
+    flextable,
+    dplyr
 Suggests:
     testthat (>= 3.0.0),
     NADA2,
