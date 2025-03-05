@@ -19,4 +19,5 @@ Produces the proper footnote symbol based on a numeric index or numeric vector.
 atsdr_footnote_symbol(1)
 atsdr_footnote_symbol(1:10)
 
+
 }
