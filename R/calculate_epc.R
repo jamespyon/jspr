@@ -7,7 +7,7 @@
 #' @param conf.level A numeric vector from 0 to 1 for confidence level. Default is 0.90 for computing 95UCL.
 #' @param sigfig A numeric value for the number of significant figures for the outputs of the function. Default is 4.
 #' @param testForNormal Logical. If you want to test for normal distribution of your obs. Default is TRUE
-#' @param useDefaultSeed Logical. The Default TRUE uses my custom seed.
+#' @param useDefaultSeed Logical. The Default TRUE uses custom seed similar to EPCTool, which is sum of all concentrations. For testing, either upload separate files of individual data subsets to EPCTool or sum all obs in clean dataset and set to seed.
 #'
 #' @return A data.frame class object.
 #' * `function_used`: the character string representing the type of calculation used for the EPC.
@@ -29,7 +29,6 @@
 #' @export
 #'
 #' @examples
-#' set.seed(20240406)
 #' results <- rexp(n = 15, rate = 1)
 #' nondetects <- results<0.5
 #' calculate_epc(obs = results, cen = nondetects)
@@ -53,7 +52,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
   #rlang::abort("abort")
 
   #set dataset seed.
-  if(useDefaultSeed){set.seed(20240406)}
+  if(useDefaultSeed){set.seed(sum(obs))}
 
   # final output
   df <- data.frame(
@@ -133,12 +132,35 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
       df$mean <- as.numeric(distData$parameters["mean"])
       df$mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
 
+      if(df$function_used == "lognormalBootstrap_95ucl") {
+        cv <- distData$parameters[[2]]
+        df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
+        df$median <- EnvStats::qlnormAlt(0.5, df$mean, cv) # Median, since it isn't directly reported
+
+        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig)
+        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig)
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+      }
+      if(df$function_used == "bootstrap_95ucl") {
+        cv <- distData$parameters[[2]]
+        df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
+        df$median <- EnvStats::qlnormAlt(0.5, df$mean, cv) # keep as normal dist for now
+
+        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig) # keep as normal dist for now
+        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig) # keep as normal dist for now
+        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+      }
+
     } else {
 
       bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
       df$epc <- boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[5]]
       df$mean <- mean(bootoutput$t)
       df$mean_lci <- signif(boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[4]], sigfig)
+      df$median <- stats::median(bootoutput$t)
+      firstQuartile <- signif(stats::quantile(bootoutput$t, 0.25), sigfig)
+      thirdQuartile <- signif(stats::quantile(bootoutput$t, 0.75), sigfig)
+      df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "–", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
       df$function_used <- "bootstrap_95ucl"
 
     }
