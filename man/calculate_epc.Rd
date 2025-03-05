@@ -24,7 +24,7 @@ calculate_epc(
 
 \item{testForNormal}{Logical. If you want to test for normal distribution of your obs. Default is TRUE}
 
-\item{useDefaultSeed}{Logical. The Default TRUE uses my custom seed.}
+\item{useDefaultSeed}{Logical. The Default TRUE uses custom seed similar to EPCTool, which is sum of all concentrations. For testing, either upload separate files of individual data subsets to EPCTool or sum all obs in clean dataset and set to seed.}
 }
 \value{
 A data.frame class object.
@@ -50,7 +50,6 @@ A data.frame class object.
 Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
 }
 \examples{
-set.seed(20240406)
 results <- rexp(n = 15, rate = 1)
 nondetects <- results<0.5
 calculate_epc(obs = results, cen = nondetects)
