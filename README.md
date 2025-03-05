@@ -60,21 +60,6 @@ devtools::install_github("jamespyon/jspr")
 
 Here are some of the main features of the *jspr* R package.
 
-### atsdr_footnote_symbol()
-
-This function produces the required footnote symbol depending on the
-index you want. The input is a single or multiple numbers. These aren’t
-ASCII friendly in R so this is useful to just have around.
-
-``` r
-library(jspr)
-
-atsdr_footnote_symbol(1)
-#> [1] "*"
-atsdr_footnote_symbol(1:10)
-#>  [1] "*"  "†"  "‡"  "§"  "¶"  "**" "††" "‡‡" "§§" "¶¶"
-```
-
 ### calculate_epc()
 
 Taken and reformatted from `atsdrepc` R package, this function
@@ -96,20 +81,10 @@ results <- rexp(n = 16, rate = 1)
 nondetects <- results<0.5
 
 calculate_epc(obs = results, cen = nondetects)$epc
-#> [1] 3.392521
+#> [1] 1.770186
 
 #example of dplyr verbs with dataframe
 library(tidyverse)
-#> Warning: package 'tidyverse' was built under R version 4.4.3
-#> Warning: package 'ggplot2' was built under R version 4.4.3
-#> Warning: package 'tibble' was built under R version 4.4.3
-#> Warning: package 'tidyr' was built under R version 4.4.3
-#> Warning: package 'readr' was built under R version 4.4.3
-#> Warning: package 'purrr' was built under R version 4.4.3
-#> Warning: package 'dplyr' was built under R version 4.4.3
-#> Warning: package 'stringr' was built under R version 4.4.3
-#> Warning: package 'forcats' was built under R version 4.4.3
-#> Warning: package 'lubridate' was built under R version 4.4.3
 #> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 #> ✔ dplyr     1.1.4     ✔ readr     2.1.5
 #> ✔ forcats   1.0.0     ✔ stringr   1.5.1
@@ -127,9 +102,55 @@ data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
 #> # A tibble: 2 × 2
 #>   group   epc
 #>   <chr> <dbl>
-#> 1 A      6.93
-#> 2 B      3.08
+#> 1 A      2.96
+#> 2 B     68.5
 ```
+
+### atsdr_footnote_symbol()
+
+This function produces the required footnote symbol depending on the
+index you want. The input is a single or multiple numbers. These aren’t
+great to type out in R so this is useful to just have around.
+
+``` r
+library(jspr)
+
+atsdr_footnote_symbol(1)
+#> [1] "*"
+atsdr_footnote_symbol(1:10)
+#>  [1] "*"  "†"  "‡"  "§"  "¶"  "**" "††" "‡‡" "§§" "¶¶"
+```
+
+### flextable_atsdr_footnote()
+
+This is a wrapper function for `atsdr_footnote_symbol()` that produces
+footnotes for your flextable, rather than copy-and-pasting
+`flextable::footnote()` in an endless tidyverse piping loop.
+
+``` r
+library(jspr)
+library(tidyverse)
+library(flextable)
+#> 
+#> Attaching package: 'flextable'
+#> The following object is masked from 'package:purrr':
+#> 
+#>     compose
+
+example_dataset <- head(iris) |>
+  flextable::flextable() |>
+  flextable::set_caption(flextable::as_paragraph("Iris Title"))
+
+add_footnotes <- data.frame(
+  comment = c("column 3", "location (2,3)", "location (1,1)", "column 2", "title"),
+  i = c(NA, 2, 1, NA, NA),
+  j = c(3, 3, 1, 2, NA)
+)
+
+example_dataset |> flextable_atsdr_footnote(add_footnotes)
+```
+
+<img src="man/figures/README-flextable_atsdr_footnote_example-1.png" width="100%" />
 
 ## **Other Features**
 

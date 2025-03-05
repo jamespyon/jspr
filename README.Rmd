@@ -48,18 +48,6 @@ devtools::install_github("jamespyon/jspr")
 
 Here are some of the main features of the *jspr* R package.
 
-### atsdr_footnote_symbol()
-
-This function produces the required footnote symbol depending on the index you want. The input is a single or multiple numbers. These aren't ASCII friendly in R so this is useful to just have around.
-
-```{r atsdr_footnote_symbol_example}
-library(jspr)
-
-atsdr_footnote_symbol(1)
-atsdr_footnote_symbol(1:10)
-
-```
-
 ### calculate_epc()
 
 Taken and reformatted from `atsdrepc` R package, this function calculates the exposure point concentration used in health consultations or other projects. The original uses a shiny application that requires an .xlsx template input that is complicated with R. This function helps makes the process easier for those who know what to do (i.e. Don't use this if this is your first rodeo, cowboy).
@@ -81,6 +69,41 @@ library(tidyverse)
 data.frame(results, nondetects, group = rep(c("A", "B"), 8)) %>%
   group_by(group) %>%
   summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
+
+```
+
+### atsdr_footnote_symbol()
+
+This function produces the required footnote symbol depending on the index you want. The input is a single or multiple numbers. These aren't great to type out in R so this is useful to just have around.
+
+```{r atsdr_footnote_symbol_example}
+library(jspr)
+
+atsdr_footnote_symbol(1)
+atsdr_footnote_symbol(1:10)
+
+```
+
+### flextable_atsdr_footnote()
+
+This is a wrapper function for `atsdr_footnote_symbol()` that produces footnotes for your flextable, rather than copy-and-pasting `flextable::footnote()` in an endless tidyverse piping loop.
+
+```{r flextable_atsdr_footnote_example}
+library(jspr)
+library(tidyverse)
+library(flextable)
+
+example_dataset <- head(iris) |>
+  flextable::flextable() |>
+  flextable::set_caption(flextable::as_paragraph("Iris Title"))
+
+add_footnotes <- data.frame(
+  comment = c("column 3", "location (2,3)", "location (1,1)", "column 2", "title"),
+  i = c(NA, 2, 1, NA, NA),
+  j = c(3, 3, 1, 2, NA)
+)
+
+example_dataset |> flextable_atsdr_footnote(add_footnotes)
 
 ```
 
