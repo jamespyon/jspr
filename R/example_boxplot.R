@@ -1,3 +1,21 @@
+#' Create Example Boxplot
+#'
+#'@description Creates a boxplot skeleton which shows all parts of the boxplot with labels naming each part, with options to format the plot as you would like -- useful when you need an example of a boxplot for your appendix.
+#' @param x An optional numerical vector if you want to import your own data instead
+#' @param plot.color A character string denoting a color for the boxplot generated
+#' @param bracket.color A character string denoting a color for the drawn lines generated
+#' @param text.color A character string denoting a color for the text generated
+#' @param title A character string for an optional title
+#' @param caption A character string for an optional caption
+#'
+#' @returns A ggplot class object
+#'
+#' @export
+#'
+#' @examples
+#' example_boxplot()
+#'
+
 example_boxplot <- function(x = NULL, plot.color = "black", bracket.color = "darkgray", text.color = "black", title = "", caption = "") {
 
   # vector x setting
