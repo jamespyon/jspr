@@ -127,6 +127,18 @@ add_footnotes <- data.frame(
 example_dataset |> flextable_atsdr_footnote(add_footnotes)
 ```
 
+### example_boxplot()
+
+This is a self contained function that makes a boxplot with labels that have the 
+names of all the parts of a boxplot. There are also options to help you change some 
+of the parts. More options to be added later.
+
+``` r
+library(jspr)
+
+example_boxplot()
+```
+
 ## **Other Features**
 
 *Coming soon to theaters near you~*
