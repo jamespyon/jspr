@@ -1,6 +1,6 @@
 Package: jspr
 Title: Useful Functions for ATSDR Projects
-Version: 0.2.1
+Version: 0.3.0
 Authors@R: 
   c(person("James", "Pyon", , "pyonjs@hotmail.com", role = c("aut", "cre"))
   )
