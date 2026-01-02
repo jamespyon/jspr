@@ -1,63 +1,124 @@
-example_boxplot <- function(x = NULL, plot.color = "black", bracket.color = "black", text.color = "black") {
+example_boxplot <- function(x = NULL, plot.color = "black", bracket.color = "darkgray", text.color = "black", title = "", caption = "") {
 
+  # vector x setting
   if(!is.null(x)) {
     stop("x argument is not available at this moment.")
   } else {
     set.seed(04062023)
-    x <- rexp(1000, rate = 10)
+    x <- c(stats::rnorm(20, mean = 5, sd = 1), c(7.5, 9, 10))
   }
 
-  quant <- c(quantile(x, probs = c(0.25, 0.5, 0.75)))
+  # stat settings based on vector x
+  quant <- c(stats::quantile(x, probs = c(0.25, 0.5, 0.75)))
   mean <- mean(x)
-  iqr <- IQR(x)
-  min <- quant[1]-(1.5*iqr)
-  if(min <=0) {min <- 0}
-  max <- quant[3]+(1.5*iqr)
+  iqr <- stats::IQR(x)
+  if(min(x) <=0) {
+    minll <- 0
+  } else {
+    minll <- quant[1]-(1.5*iqr)
+    minll <- sort(x[x>minll])[1]
+  }
+  if(max(x) <=0) {
+    maxul <- 0
+  } else {
+    maxul <- quant[3]+(1.5*iqr)
+    maxul <- sort(x[x<maxul], decreasing = TRUE)[1]
+  }
+  min <- min(x)
+  max <- max(x)
 
-  data.frame(x = x, y = "Boxplot") |>
+  # annotation settings
+  lhs_arrow_head <- 0.9
+  lhs_arrow_tail_center <- 0.99
+  lhs_arrow_tail_box <- 0.92
+  lhs_text <- 0.89
+  rhs_outlier_text <- 1.03
+  rhs_outlier_bracket <- rhs_outlier_text-0.01
+  rhs_whisker_text <- 1.04
+  rhs_whisker_bracket <- rhs_whisker_text-0.01
+  rhs_box_text <- 1.1
+  rhs_box_bracket <- rhs_box_text-0.01
+
+  #generate plot
+  data.frame(x = x, y = 1) |>
     ggplot2::ggplot(ggplot2::aes(x = x, y = y)) +
-    ggplot2::geom_boxplot(color = plot.color) +
-    ggplot2::stat_summary(fun = "mean",
-                          geom = 'point',
-                          shape = 13,
-                          size = 3,
-                          position = ggplot2::position_dodge2(width = 0.75, preserve = "single")) +
-    ggplot2::annotate("text", x = quant[1], y = 1.41, label = "Q1", color = text.color) +
-    ggplot2::annotate("text", x = quant[3], y = 1.41, label = "Q3", color = text.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = mean, xend = mean,
-                                       y = 0.58, yend = 0.99),
+    ggplot2::geom_boxplot(width = 0.15, color = plot.color) +
+
+    ggplot2::annotate("text", x = maxul, y = lhs_text, label = "Upper Extreme",
+                      color = text.color, size = 4, hjust = 1) +
+    ggplot2::geom_segment(ggplot2::aes(x = maxul, xend = maxul,
+                                       y = lhs_arrow_tail_center, yend = lhs_arrow_head),
                           arrow = grid::arrow(angle = 50,
                                               length = grid::unit(7, "points"),
                                               type = "closed"),
-                          color = bracket.color) +
-    ggplot2::annotate("text", x = quant[2], y = 1.41, label = "Median", color = text.color) +
-    ggplot2::annotate("text", x = mean, y = 0.55, label = "Mean", color = text.color) +
-    cowplot::theme_cowplot() +
+                          color = bracket.color, linewidth = 1)+
+
+    ggplot2::annotate("text", x = quant[3], y = lhs_text, label = "75th percentile",
+                      color = text.color, size = 4, hjust = 1) +
+    ggplot2::geom_segment(ggplot2::aes(x = quant[3], xend = quant[3],
+                                       y = lhs_arrow_tail_box, yend = lhs_arrow_head),
+                          arrow = grid::arrow(angle = 50,
+                                              length = grid::unit(7, "points"),
+                                              type = "closed"),
+                          color = bracket.color, linewidth = 1) +
+
+    ggplot2::geom_point(ggplot2::aes(x = mean, y = 1), shape = 10, size = 4) +
+    ggplot2::annotate("text", x = mean, y = lhs_text, label = "Mean",
+                      color = text.color, size = 4, hjust = 1) +
+    ggplot2::geom_segment(ggplot2::aes(x = mean, xend = mean,
+                                       y = lhs_arrow_tail_center, yend = lhs_arrow_head),
+                          arrow = grid::arrow(angle = 50,
+                                              length = grid::unit(7, "points"),
+                                              type = "closed"),
+                          color = bracket.color, linewidth = 1) +
+
+    ggplot2::annotate("text", x = quant[2], y = lhs_text, label = "Median",
+                      color = text.color, size = 4, hjust = 1) +
+    ggplot2::geom_segment(ggplot2::aes(x = quant[2], xend = quant[2],
+                                       y = lhs_arrow_tail_box, yend = lhs_arrow_head),
+                          arrow = grid::arrow(angle = 50,
+                                              length = grid::unit(7, "points"),
+                                              type = "closed"),
+                          color = bracket.color, linewidth = 1) +
+
+    ggplot2::annotate("text", x = quant[1], y = lhs_text, label = "25th percentile",
+                      color = text.color, size = 4, hjust = 1) +
+    ggplot2::geom_segment(ggplot2::aes(x = quant[1], xend = quant[1],
+                                       y = lhs_arrow_tail_box, yend = lhs_arrow_head),
+                          arrow = grid::arrow(angle = 50,
+                                              length = grid::unit(7, "points"),
+                                              type = "closed"),
+                          color = bracket.color, linewidth = 1) +
+
+    ggplot2::annotate("text", x = minll, y = lhs_text, label = "Lower Extreme",
+                      color = text.color, size = 4, hjust = 1) +
+    ggplot2::geom_segment(ggplot2::aes(x = minll, xend = minll,
+                                       y = lhs_arrow_tail_center, yend = lhs_arrow_head),
+                          arrow = grid::arrow(angle = 50,
+                                              length = grid::unit(7, "points"),
+                                              type = "closed"),
+                          color = bracket.color, linewidth = 1) +
+
+    ggplot2::annotate("text", x = maxul + (max - maxul)/2, y = rhs_outlier_text, label = "Outliers",
+                      color = text.color, size = 4, hjust = 0) +
+    ggpubr::geom_bracket(xmin = maxul+0.02, xmax = max+0.02, y.position = rhs_outlier_bracket, label = "",
+                         color = bracket.color, size = 1) +
+
+    ggplot2::annotate("text", x = quant[3] + (maxul - quant[3])/2, y = rhs_whisker_text, label = "Whisker",
+                      color = text.color, size = 4, hjust = 0) +
+    ggpubr::geom_bracket(xmin = quant[3]+0.02, xmax = maxul-0.02, y.position = rhs_whisker_bracket, label = "",
+                         color = bracket.color, size = 1) +
+
+    ggplot2::annotate("text", x = quant[1] + (quant[3] - quant[1])/2, y = rhs_box_text, label = "Box",
+                      color = text.color, size = 4, hjust = 0) +
+    ggpubr::geom_bracket(xmin = quant[1]+0.02, xmax = quant[3]-0.02, y.position = rhs_box_bracket, label = "",
+                         color = bracket.color, size = 1) +
+
+    ggplot2::ylim(0.5, 1.5) +
+    ggplot2::coord_flip() +
+    ggplot2::theme_void() +
     ggplot2::labs(x = "", y = "",
-                  title = "",
-                  caption = "")
-
-
-
-
-    ggplot2::geom_segment(ggplot2::aes(x = 1.39, xend = 1.4, y = quant[1]+0.001, yend = quant[1]+0.001), color = bracket.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.39, xend = 1.4, y = quant[3]-0.001, yend = quant[3]-0.001), color = bracket.color) +
-    ggplot2::annotate("text", x = 1.41, y = 0.09, label = "Interquartile\nRange", hjust = 0, color = text.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.4, xend = 1.4, y = quant[1]-0.001, yend = min), color = bracket.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.39, xend = 1.4, y = quant[1]-0.001, yend = quant[1]-0.001), color = bracket.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.39, xend = 1.4, y = min, yend = min), color = bracket.color) +
-    ggplot2::annotate("text", x = 1.41, y = 0.020, label = "Lower\nIQR", hjust = 0, color = text.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.4, xend = 1.4, y = 0.142, yend = 0.310), color = bracket.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.39, xend = 1.4, y = 0.142, yend = 0.142), color = bracket.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.39, xend = 1.4, y = 0.310, yend = 0.310), color = bracket.color) +
-    ggplot2::annotate("text", x = 1.41, y = 0.24, label = "Upper\nIQR", hjust = 0, color = text.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.4, xend = 1.4, y = 0.312, yend = 0.77), color = bracket.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.39, xend = 1.4, y = 0.312, yend = 0.312), color = bracket.color) +
-    ggplot2::geom_segment(ggplot2::aes(x = 1.39, xend = 1.4, y = 0.77, yend = 0.77), color = bracket.color) +
-    ggplot2::annotate("text", x = 1.41, y = 0.55, label = "Outliers", hjust = 0, color = text.color) +
-    cowplot::theme_cowplot() +
-    ggplot2::labs(x = "", y = "",
-         title = "",
-         caption = "")
+                  title = title,
+                  caption = caption)
 
 }
