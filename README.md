@@ -4,6 +4,7 @@
 # **jspr (Pronounced *ˈja-spər* or *ˈdʒæspə*)**
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 ## Introduction
@@ -129,9 +130,9 @@ example_dataset |> flextable_atsdr_footnote(add_footnotes)
 
 ### example_boxplot()
 
-This is a self contained function that makes a boxplot with labels that have the 
-names of all the parts of a boxplot. There are also options to help you change some 
-of the parts. More options to be added later.
+This is a self contained function that makes a boxplot with labels that
+have the names of all the parts of a boxplot. There are also options to
+help you change some of the parts. More options to be added later.
 
 ``` r
 library(jspr)
