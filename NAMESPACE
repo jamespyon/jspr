@@ -2,3 +2,4 @@
 
 export(atsdr_footnote_symbol)
 export(calculate_epc)
+export(example_boxplot)
