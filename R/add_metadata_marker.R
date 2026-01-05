@@ -22,7 +22,7 @@
 #' | exemptByMissionSystem    | Code is exempt as it supports critical mission operations |
 #' | exemptByCIO              | Code has a special exemption approved by the CDC CIO      |
 #'
-#' @returns
+#' @returns An edit to the README.md file of the repository of the project you are in.
 #'
 #' @export
 #'
