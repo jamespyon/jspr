@@ -1,5 +1,5 @@
 Package: jspr
-Title: Useful Functions for ATSDR Projects
+Title: Personal R Package Filled with Useful Functions
 Version: 0.3.0
 Authors@R: 
   c(person("James", "Pyon", , "pyonjs@hotmail.com", role = c("aut", "cre"))
