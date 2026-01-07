@@ -4,7 +4,7 @@
 \alias{barkjohn_correction}
 \title{Barkjohn Correction Factor for PurpleAir monitors}
 \usage{
-barkjohn_correction(x, rh)
+barkjohn_correction(x, rh, warnings = TRUE)
 }
 \arguments{
 \item{x}{A value representing PurpleAir PM2.5 output}
