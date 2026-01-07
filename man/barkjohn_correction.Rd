@@ -10,6 +10,8 @@ barkjohn_correction(x, rh, warnings = TRUE)
 \item{x}{A value representing PurpleAir PM2.5 output}
 
 \item{rh}{A value representing PurpleAir relative humidity}
+
+\item{warnings}{A logical value. Change to remove warnings}
 }
 \value{
 A numeric class object

@@ -11,8 +11,7 @@ test_that("calculate_epc() test with contaminants data", {
   output <- data |>
     dplyr::filter(exposure_unit != "BLDG 1000") |>
     dplyr::group_by(exposure_unit, media, contaminant) |>
-    dplyr::summarise(epc = jspr::calculate_epc(concentration, non_detect)$epc,
-              type = jspr::calculate_epc(concentration, non_detect)$function_used)
+    dplyr::summarise(epc = jspr::calculate_epc(concentration, non_detect)$epc)
 
   expect_equal(signif(output$epc, 2), c(1, 12, 5.6, 0.17, 7.40, 7.90, 9.80, 1900, 1200, 2.60, 0.21, 2.70, 1500))
 })

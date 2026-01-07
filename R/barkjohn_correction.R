@@ -4,6 +4,7 @@
 #'
 #' @param x A value representing PurpleAir PM2.5 output
 #' @param rh A value representing PurpleAir relative humidity
+#' @param warnings A logical value. Change to remove warnings
 #'
 #' @returns A numeric class object
 #'
