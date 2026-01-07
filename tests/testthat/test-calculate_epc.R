@@ -3,3 +3,4 @@ test_that("calculate_epc() calculates epc", {
   nondetects <- results<8
   expect_equal(calculate_epc(obs = results, cen = nondetects)$epc, 10.090688)
 })
+
