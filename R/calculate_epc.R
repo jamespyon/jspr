@@ -1,6 +1,6 @@
 #' Calculate Exposure Point Concentrations (EPCs)
 #'
-#'@description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
+#' @description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
 #'
 #' @param obs A numeric vector
 #' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
@@ -9,7 +9,7 @@
 #' @param testForNormal Logical. If you want to test for normal distribution of your obs. Default is TRUE
 #' @param useDefaultSeed Logical. The Default TRUE uses custom seed similar to EPCTool, which is sum of all concentrations. For testing, either upload separate files of individual data subsets to EPCTool or sum all obs in clean dataset and set to seed.
 #'
-#' @return A data.frame class object.
+#' @returns A data.frame class object.
 #' * `function_used`: the character string representing the type of calculation used for the EPC.
 #' * `mean`: numeric value of the estimated mean based on `function_used`.
 #' * `sd`: numeric value of the estimated standard deviation based on `function_used`.
@@ -51,6 +51,9 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
     unique_detected_values <- unique(obs[!cen])
     unique_detected_count <- length(unique_detected_values)
     max_detected_value <- signif(max(unique_detected_values), sigfig)
+  } else {
+    unique_detected_values <- unique(obs)
+    unique_detected_count <- length(unique_detected_values)
   }
 
   #warnings
@@ -86,18 +89,21 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
     df$epc <- signif(max(obs), sigfig)
     df$function_used <- "no_detections"
     df$notes <- "This dataset did not contain any detected results, so an EPC could not be calculated. Use the maximum censoring limit."
+    return(df)
 
   } else if(detected_count < 4) { #if less than 4 detected, we use max detected
 
     df$epc <- max_detected_value
     df$function_used <- "max_less_than_4_detections"
     df$notes <- message_breaks(df$notes, "This dataset contained less than four detections, so the EPC is equal to the maximum detected value.")
+    return(df)
 
   } else if(nondetect_percent >= 0.8){ #if equal/more than 80% non-detected, we use max detected
 
     df$epc <- max_detected_value
     df$function_used <- "max_80_percent_or_more_non_detects"
     df$notes <- message_breaks(df$notes, "This dataset contained 80% or more non-detects, so the EPC is equal to the maximum detected value.")
+    return(df)
 
   }
 
@@ -178,7 +184,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
     if(nondetect_count > 0){
 
-      bCox <- EnvStats::boxcoxCensored(obs,cen,lambda = seq(0,1,0.1))
+      bCox <- EnvStats::boxcoxCensored(obs, cen, lambda = seq(0, 1, 0.1))
       ppcc <- bCox$objective
 
       lognorm_dist <- ppcc[1]

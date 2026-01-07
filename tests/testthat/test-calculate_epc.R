@@ -3,3 +3,16 @@ test_that("calculate_epc() calculates epc", {
   nondetects <- results<8
   expect_equal(calculate_epc(obs = results, cen = nondetects)$epc, 10.090688)
 })
+
+test_that("calculate_epc() test with contaminants data", {
+  data <- jspr::contaminants |>
+    mutate(non_detect = case_when(detected_flag == 0 ~ TRUE,
+                                  detected_flag == 1 ~ FALSE))
+  output <- data |>
+    filter(exposure_unit != "BLDG 1000") |>
+    group_by(exposure_unit, media, contaminant) |>
+    summarise(epc = jspr::calculate_epc(concentration, non_detect)$epc,
+              type = jspr::calculate_epc(concentration, non_detect)$function_used)
+
+  expect_equal(signif(output$epc, 2), c(1, 12, 5.6, 0.17, 7.40, 7.90, 9.80, 1900, 1200, 2.60, 0.21, 2.70, 1500))
+})
