@@ -2,5 +2,7 @@
 
 export(add_metadata_marker)
 export(atsdr_footnote_symbol)
+export(barkjohn_correction)
 export(calculate_epc)
 export(example_boxplot)
+export(jspr_install_packages)
