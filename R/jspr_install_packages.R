@@ -41,6 +41,6 @@ jspr_install_packages <- function(x = NULL) {
   if(is.null(x)) {x <- package_list}
   if(class(x) != "character") {stop("Must be a valid character vector.")} else {x <- c(package_list, x)}
 
-  install.packages(x)
+  utils::install.packages(x)
 
 }
