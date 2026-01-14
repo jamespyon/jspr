@@ -39,7 +39,7 @@ jspr_install_packages <- function(x = NULL) {
                     "worldmet")
 
   if(is.null(x)) {x <- package_list}
-  if(class(x) != "character") {stop("Must be a valid character vector.")} else {x <- c(package_list, x)}
+  if(!is.character(x)) {stop("Must be a valid character vector.")} else {x <- c(package_list, x)}
 
   utils::install.packages(x)
 
