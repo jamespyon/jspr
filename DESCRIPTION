@@ -15,11 +15,12 @@ Imports:
     flextable,
     dplyr,
     ggplot2,
-    ggpubr
+    ggpubr,
+    rlang
 Suggests:
     testthat (>= 3.0.0),
-    NADA2,
-    tidyverse
+    tidyverse,
+    NADA2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
