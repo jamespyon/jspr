@@ -14,7 +14,7 @@
 #' @param warnings Logical. Do you want warnings?
 #'
 #' @returns A ggplot class object.
-#'
+#' @importFrom rlang .data
 #' @export
 #'
 #' @examples
@@ -79,8 +79,8 @@ example_boxplot <- function(x = c("rnorm", "rlnorm", "rexp"), add.mean = TRUE, m
   rhs_box_bracket <- rhs_box_text-0.01
 
   #generate base plot
-  example_plot <- data.frame(x = example_data, y = 1) |>
-    ggplot2::ggplot(ggplot2::aes(x = x, y = y)) +
+  example_plot <- data.frame(values = example_data, center = 1) |>
+    ggplot2::ggplot(mapping = ggplot2::aes(x = .data$values, y = .data$center)) +
     ggplot2::geom_boxplot(width = 0.15, color = plot.color) +
 
     ggplot2::annotate("text", x = max, y = lhs_text, label = "Maximum",
