@@ -12,12 +12,9 @@ message_breaks = function(prev_message, new_message){
 # function for custom date formating
 jspr_systime <- function() {
 
-  string <- Sys.time()
+  string <- format(Sys.time(), "%Y%m%d%H%M%S")
 
-  year <- substr(string, 1, 4)
-  sec <- substr(string, 18, 19)
-
-  paste0(year, month, day, " ", hour, ":", min, ":", sec)
+  return(string)
 
 }
 
