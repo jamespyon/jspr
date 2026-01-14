@@ -1,6 +1,6 @@
 Package: jspr
 Title: Personal R Package Filled with Useful Functions
-Version: 0.6.1
+Version: 0.6.2
 Authors@R: 
   c(person("James", "Pyon", , "pyonjs@hotmail.com", role = c("aut", "cre"))
   )
