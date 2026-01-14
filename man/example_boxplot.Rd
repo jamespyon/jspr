@@ -2,32 +2,47 @@
 % Please edit documentation in R/example_boxplot.R
 \name{example_boxplot}
 \alias{example_boxplot}
-\title{Create Example Boxplot}
+\title{Create Example Boxplot for Appendices}
 \usage{
 example_boxplot(
-  x = NULL,
+  x = c("rnorm", "rlnorm", "rexp"),
+  add.mean = TRUE,
+  mean.shape = 10,
+  text.size = 4,
+  bracket.size = 1,
   plot.color = "black",
   bracket.color = "darkgray",
   text.color = "black",
   title = "",
-  caption = ""
+  caption = "",
+  warnings = TRUE
 )
 }
 \arguments{
-\item{x}{An optional numerical vector if you want to import your own data instead}
+\item{x}{An optional character string denoting the type of distribution to use to generate the boxplot. Default is 'rnorm'.}
 
-\item{plot.color}{A character string denoting a color for the boxplot generated}
+\item{add.mean}{Logical. If you want mean to be added to the boxplot. Default is TRUE.}
 
-\item{bracket.color}{A character string denoting a color for the drawn lines generated}
+\item{mean.shape}{Numeric. Based on ggplot2 point shape.}
 
-\item{text.color}{A character string denoting a color for the text generated}
+\item{text.size}{Numeric. Based on ggplot2 text size.}
 
-\item{title}{A character string for an optional title}
+\item{bracket.size}{Numeric. Based on ggplot2 linewidth and ggpubr bracket size.}
 
-\item{caption}{A character string for an optional caption}
+\item{plot.color}{A character string denoting a color for the boxplot generated.}
+
+\item{bracket.color}{A character string denoting a color for the drawn lines generated.}
+
+\item{text.color}{A character string denoting a color for the text generated.}
+
+\item{title}{A character string for an optional title.}
+
+\item{caption}{A character string for an optional caption.}
+
+\item{warnings}{Logical. Do you want warnings?}
 }
 \value{
-A ggplot class object
+A ggplot class object.
 }
 \description{
 Creates a boxplot skeleton which shows all parts of the boxplot with labels naming each part, with options to format the plot as you would like -- useful when you need an example of a boxplot for your appendix.
