@@ -64,23 +64,21 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
   if(useDefaultSeed){set.seed(sum(obs))}
 
   # final output
-  df <- data.frame(
-    function_used = "",
-    mean = NA,
-    sd = NA,
-    median = NA,
-    epc = NA,
-    mean_lci = NA,
-    mean_uci = NA,
-    notes = "",
-    qcontrol = "",
-    normal_dist = NA,
-    lognorm_dist = NA,
-    gamma_dist = NA,
-    best_dist = "NA",
-    dist_iqr = "NA",
-    mean_ci = ""
-  )
+  df <- data.frame(function_used = "",
+                   mean = NA,
+                   sd = NA,
+                   median = NA,
+                   epc = NA,
+                   mean_lci = NA,
+                   mean_uci = NA,
+                   notes = "",
+                   qcontrol = "",
+                   normal_dist = NA,
+                   lognorm_dist = NA,
+                   gamma_dist = NA,
+                   best_dist = "NA",
+                   dist_iqr = "NA",
+                   mean_ci = "")
 
   #perform initial screening for conditions that don't allow for 95UCL calculation
 

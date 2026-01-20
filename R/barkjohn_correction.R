@@ -2,9 +2,9 @@
 #'
 #' @description Applies the EPA standardized version of the Barkjohn correction factor for PurpleAir devices.
 #'
-#' @param x A value representing PurpleAir PM2.5 output
-#' @param rh A value representing PurpleAir relative humidity
-#' @param warnings A logical value. Change to remove warnings
+#' @param x A value representing PurpleAir PM2.5 output.
+#' @param rh A value representing PurpleAir relative humidity.
+#' @param warnings A logical value. Change to remove warnings.
 #'
 #' @returns A numeric class object
 #'

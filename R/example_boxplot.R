@@ -24,7 +24,7 @@
 example_boxplot <- function(x = c("rnorm", "rlnorm", "rexp"), add.mean = TRUE, mean.shape = 10, text.size = 4, bracket.size = 1, plot.color = "black", bracket.color = "darkgray", text.color = "black", title = "", caption = "", warnings = TRUE) {
 
   # warning
-  jspr_warning("This function changes Global Settings.", warning= TRUE)
+  jspr_warning("This function changes Global Settings.", warnings)
 
   # vector x setting
   if(identical(x, c("rnorm", "rlnorm", "rexp"))) {x <- "rnorm"}
