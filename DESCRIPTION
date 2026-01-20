@@ -2,9 +2,8 @@ Package: jspr
 Title: Personal R Package Filled with Useful Functions
 Version: 0.7.0
 Authors@R: 
-  c(person("James", "Pyon", , "pyonjs@hotmail.com", role = c("aut", "cre"))
-  )
-Description: A personal package containing useful custom functions used on a daily basis in the life of an ATSDR EI human.
+  c(person("James", "Pyon", , "pyonjs@hotmail.com", role = c("aut", "cre")))
+Description: A personal package containing useful custom functions used on a daily basis in the life of an human that uses R.
 License: MIT + file LICENSE
 URL: https://github.com/jamespyon/jspr
 Imports:
