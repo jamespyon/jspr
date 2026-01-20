@@ -30,6 +30,7 @@
 #' \dontrun{
 #' add_metadata_marker("zzz0", exemption = "exemptByCIO", exemption_justification = "ei")
 #' }
+#'
 
 add_metadata_marker <- function(contact_email, org = "ATSDR", version = NA, status = c("Maintained", "Deprecated"), keywords = NA, labor_hours = NA, contract = NA, exemption = NA, exemption_justification = NA) {
 
