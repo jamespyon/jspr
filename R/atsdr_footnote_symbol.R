@@ -1,6 +1,6 @@
 #' Footnote Symbols based on ATSDR Style Manual (2019)
 #'
-#'@description Produces the proper footnote symbol based on a numeric index or numeric vector.
+#' @description Produces the proper footnote symbol based on a numeric index or numeric vector.
 #'
 #' @param i An index according to the symbol order of a footnote. Value of 0 gives the five unique footnote symbols in order of usage in the manual (useful if you just need the symbols themselves). If the index is a vector, a list of selected footnote symbols will be outputted. Default is 0.
 #'
