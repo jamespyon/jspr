@@ -55,4 +55,5 @@ Add metadata marker based on SHARE IT Act of 2024 to be read by OCIO AI scanner.
 \dontrun{
 add_metadata_marker("zzz0", exemption = "exemptByCIO", exemption_justification = "ei")
 }
+
 }
