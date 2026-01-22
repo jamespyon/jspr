@@ -33,9 +33,9 @@ example_dataset <- head(iris) |>
   flextable::set_caption(flextable::as_paragraph("Iris Title"))
 
 add_footnotes <- data.frame(
-  comment = c("column 3", "location (2,3)", "location (1,1)", "column 2", "title"),
-  i = c(NA, 2, 1, NA, NA),
-  j = c(3, 3, 1, 2, NA)
+  comment = c("col", "cell 1", "cell 1", "col", "title", "cell 2", "col 2", "cell 3", "cell 4"),
+  i = c(NA, 2, 1, NA, NA, 3, NA, 4, 6),
+  j = c(3, 3, 1, 2, NA, 3, 4, 4, 4)
 )
 
 #example_dataset |> flextable_atsdr_footnote(add_footnotes)
