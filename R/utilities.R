@@ -1,5 +1,5 @@
 # function to make iterative statements
-message_breaks = function(prev_message, new_message){
+message_breaks <- function(prev_message, new_message){
 
   num_breaks <- "; "
 
