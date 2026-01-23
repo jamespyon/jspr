@@ -120,9 +120,9 @@ example_dataset <- head(iris) |>
   flextable::set_caption(flextable::as_paragraph("Iris Title"))
 
 add_footnotes <- data.frame(
-  comment = c("column 3", "location (2,3)", "location (1,1)", "column 2", "title"),
-  i = c(NA, 2, 1, NA, NA),
-  j = c(3, 3, 1, 2, NA)
+  comment = c("col", "cell 1", "cell 1", "col", "title", "cell 2", "col 2", "cell 3", "cell 4"),
+  i = c(NA, 2, 1, NA, NA, 3, NA, 4, 6),
+  j = c(3, 3, 1, 2, NA, 3, 4, 4, 4)
 )
 
 example_dataset |> flextable_atsdr_footnote(add_footnotes)
@@ -138,6 +138,36 @@ help you change some of the parts. More options to be added later.
 library(jspr)
 
 example_boxplot()
+```
+
+### barkjohn_correction()
+
+This function calculates the Barkjohn adjustment, based on EPA methods,
+for PurpleAir PM2.5.
+
+``` r
+barkjohn_correction(0.5, 30)
+```
+
+### ess_test()
+
+This function performs a T-test and applies the effective sample size
+adjustment for autocorrelated samples. Outputs both `t.test()` outputs
+and `ess_test()` outputs.
+
+``` r
+x <- rnorm(10, 0, 5)
+ess_test(x)
+```
+
+### add_metadata_marker()
+
+This function adds metadata markers for readme.md for most repositories
+in compliance to the SHARE IT Act of 2024. Use this function as is and
+not with a script.
+
+``` r
+ \dontrun{add_metadata_marker("zzz0", exemption = "exemptByCIO", exemption_justification = "ei")}
 ```
 
 ## **Other Features**
