@@ -30,6 +30,7 @@ calculate_epc(
 A data.frame class object.
 \itemize{
 \item \code{function_used}: the character string representing the type of calculation used for the EPC.
+\item \code{n}: numeric value for sample size used for EPC..
 \item \code{mean}: numeric value of the estimated mean based on \code{function_used}.
 \item \code{sd}: numeric value of the estimated standard deviation based on \code{function_used}.
 \item \code{median}: numeric value of the estimated median based on \code{function_used}, if available.
@@ -47,7 +48,7 @@ A data.frame class object.
 }
 }
 \description{
-Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
+Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 08/18/2025.
 }
 \examples{
 results <- rexp(n = 16, rate = 1)
