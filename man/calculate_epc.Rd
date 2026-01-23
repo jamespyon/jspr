@@ -10,7 +10,8 @@ calculate_epc(
   conf.level = 0.9,
   sigfig = 4,
   testForNormal = TRUE,
-  useDefaultSeed = TRUE
+  useDefaultSeed = TRUE,
+  warnings = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ calculate_epc(
 \item{testForNormal}{Logical. If you want to test for normal distribution of your obs. Default is TRUE}
 
 \item{useDefaultSeed}{Logical. The Default TRUE uses custom seed similar to EPCTool, which is sum of all concentrations. For testing, either upload separate files of individual data subsets to EPCTool or sum all obs in clean dataset and set to seed.}
+
+\item{warnings}{Logical. Do you want warnings?}
 }
 \value{
 A data.frame class object.

@@ -8,6 +8,7 @@
 #' @param sigfig A numeric value for the number of significant figures for the outputs of the function. Default is 4.
 #' @param testForNormal Logical. If you want to test for normal distribution of your obs. Default is TRUE
 #' @param useDefaultSeed Logical. The Default TRUE uses custom seed similar to EPCTool, which is sum of all concentrations. For testing, either upload separate files of individual data subsets to EPCTool or sum all obs in clean dataset and set to seed.
+#' @param warnings Logical. Do you want warnings?
 #'
 #' @returns A data.frame class object.
 #' * `function_used`: the character string representing the type of calculation used for the EPC.
@@ -41,7 +42,10 @@
 #'   summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
 #'
 
-calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE) {
+calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE, warnings = TRUE) {
+
+  #warnings
+  jspr_warning("This function should not be used for the following:\n*asbestos/lead,\n*radiological contaminants,\n*dioxins/polycyclic aromatic hydrocarbons (PAHs),\n*non-discrete sampling data,\n*dependent data.", warnings)
 
   #pre-processing
   obs_count <- length(obs)
@@ -56,10 +60,6 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
     unique_detected_values <- unique(obs)
     unique_detected_count <- length(unique_detected_values)
   }
-
-  #warnings
-  #rlang::warn("This function should not be used for the following:\n*asbestos/lead,\n*radiological contaminants,\n*dioxins/polycyclic aromatic hydrocarbons (PAHs),\n*non-discrete sampling data,\n*dependent data.")
-  #rlang::abort("abort")
 
   #set dataset seed.
   if(useDefaultSeed){set.seed(sum(obs))}
