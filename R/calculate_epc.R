@@ -1,6 +1,6 @@
 #' Calculate Exposure Point Concentrations (EPCs)
 #'
-#' @description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 09/21/2023.
+#' @description Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 08/18/2025.
 #'
 #' @param obs A numeric vector
 #' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
@@ -11,6 +11,7 @@
 #'
 #' @returns A data.frame class object.
 #' * `function_used`: the character string representing the type of calculation used for the EPC.
+#' * `n`: numeric value for sample size used for EPC..
 #' * `mean`: numeric value of the estimated mean based on `function_used`.
 #' * `sd`: numeric value of the estimated standard deviation based on `function_used`.
 #' * `median`: numeric value of the estimated median based on `function_used`, if available.
@@ -65,6 +66,8 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
   # final output
   df <- data.frame(function_used = "",
+                   n = obs_count,
+                   max_obs = NA,
                    mean = NA,
                    sd = NA,
                    median = NA,
@@ -80,8 +83,48 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
                    dist_iqr = "NA",
                    mean_ci = "")
 
-  #perform initial screening for conditions that don't allow for 95UCL calculation
 
+  if (detected_count > 0){
+    unique_detected_values <- unique(obs[!cen])
+    unique_detected_count <- length(unique_detected_values)
+    max_detected_value <- signif(max(unique_detected_values), sigfig)
+    df$max_obs <- max_detected_value
+
+    #Do an initial screen for nondetects greater than the maximum detected value.
+    #Remove any that are present and add a quality control flag
+    if (nondetect_count > 0){
+      nondetect_above_max_detect_count <- sum(obs > max_detected_value & cen)
+      if(nondetect_above_max_detect_count > 0){
+        df$qcontrol <- message_breaks(df$qcontrol, "The imported data contained nondetects with concentrations greater than the maximum detected concentration. These records were removed prior to completing the EPC calculations. See Section 3.1 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+
+        #remove data and redefine initial variables
+
+        #redefine the initial data used in the calculations
+        new_obs <- obs[obs<max_detected_value]
+        new_cen <- cen[obs<max_detected_value]
+
+        obs <- new_obs
+        cen <- new_cen
+        obs_count <- length(new_obs)
+        nondetect_count <- sum(new_cen)
+        detected_count <- sum(!new_cen)
+        nondetect_percent <- nondetect_count/obs_count
+        if(detected_count > 0){
+          unique_detected_values <- unique(new_obs[!new_cen])
+          unique_detected_count <- length(unique_detected_values)
+          max_detected_value <- signif(max(unique_detected_values), sigfig)
+        } else {
+          unique_detected_values <- unique(new_obs)
+          unique_detected_count <- length(unique_detected_values)
+        }
+
+        df$n = obs_count
+
+      }
+    }
+  }
+
+  #perform initial screening for conditions that don't allow for 95UCL calculation
   if(detected_count == 0){ #if not detected, we use maximum censoring limit
 
     df$epc <- signif(max(obs), sigfig)
@@ -128,12 +171,12 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
       if(length(pexceed) == 1 | stats::var(pexceed) == 0) {
 
-        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf = conf.level)
+        distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf.level = conf.level)
         df$function_used <- "lognormalBootstrap_95ucl"
 
       } else {
 
-        distData <- EnvStats::enparCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap", n.bootstraps = 5000, conf = conf.level)
+        distData <- EnvStats::enparCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap", n.bootstraps = 5000, conf.level = conf.level)
         df$function_used <- "bootstrap_95ucl"
 
       }
@@ -350,7 +393,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
       } else {
 
-        df$qcontrol <- message_breaks(df$qcontrol, "The model estimated mean for the best fitting distribution was greater than the maximum detected value, so the EPC was evaluated using the next best fitting distribution instead. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+        df$qcontrol <- message_breaks(df$qcontrol, "The model estimated mean for the best fitting distribution was greater than the maximum detected value, so the EPC was evaluated using the next best fitting distribution instead. See Section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
 
       }
 
@@ -487,8 +530,8 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
     } else {
 
-      df$qcontrol <- message_breaks(df$qcontrol, "The normal distribution best fit the imported data, but it included an unacceptable amount of negative values so the next best-fitting distribution was used instead. See Section 3.5 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
-      df$notes <- message_breaks(df$notes,"This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, but the assumed distribution contained an unrealistic amount of negative values. The lognormal distribution was the next best-fitting distribution, so the EPC was calculated assuming a lognormal distribution.")
+      df$qcontrol <- message_breaks(df$qcontrol, "The normal distribution best fit the imported data, but it included unrealistic values so the next best-fitting distribution was used instead. See Section 3.5 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+      df$notes <- message_breaks(df$notes,"This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, but the assumed distribution contained unrealistic values. The lognormal distribution was the next best-fitting distribution, so the EPC was calculated assuming a lognormal distribution.")
 
     }
 
@@ -500,8 +543,8 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
     } else {
 
-      df$qcontrol <- message_breaks(df$qcontrol, "The normal distribution best fit the imported data, but it included an unacceptable amount of negative values so the next best-fitting distribution was used instead. See section 3.5 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
-      df$notes <- message_breaks(df$notes,"This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, but the assumed distribution contained an unrealistic amount of negative values. The gamma distribution was the next best-fitting distribution, so the EPC was calculated assuming a gamma distribution.")
+      df$qcontrol <- message_breaks(df$qcontrol, "The normal distribution best fit the imported data, but it included unrealistic values so the next best-fitting distribution was used instead. See Section 3.5 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+      df$notes <- message_breaks(df$notes,"This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, but the assumed distribution contained unrealistic values. The gamma distribution was the next best-fitting distribution, so the EPC was calculated assuming a gamma distribution.")
 
     }
   }
