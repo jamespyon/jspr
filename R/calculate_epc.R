@@ -10,7 +10,7 @@
 #' @param useDefaultSeed Logical. The Default TRUE uses custom seed similar to EPCTool, which is sum of all concentrations. For testing, either upload separate files of individual data subsets to EPCTool or sum all obs in clean dataset and set to seed.
 #' @param warnings Logical. Do you want warnings?
 #'
-#' @returns A data.frame class object.
+#' @returns A list class object.
 #' * `function_used`: the character string representing the type of calculation used for the EPC.
 #' * `n`: numeric value for sample size used for EPC..
 #' * `mean`: numeric value of the estimated mean based on `function_used`.
@@ -42,10 +42,18 @@
 #'   summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
 #'
 
-calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE, warnings = TRUE) {
+calculate_epc <- function(obs, cen, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE, warnings = TRUE) {
 
   #warnings
-  jspr_warning("This function should not be used for the following:\n*asbestos/lead,\n*radiological contaminants,\n*dioxins/polycyclic aromatic hydrocarbons (PAHs),\n*non-discrete sampling data,\n*dependent data.", warnings)
+  if(warnings == TRUE) {
+    warning(paste("This function should not be used for the following:",
+                  " *asbestos/lead.",
+                  " *radiological contaminants.",
+                  " *dioxins/polycyclic aromatic hydrocarbons (PAHs).",
+                  " *non-discrete sampling data.",
+                  " *dependent data.",
+                  sep = "\n"))
+  }
 
   #pre-processing
   obs_count <- length(obs)
@@ -65,37 +73,36 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
   if(useDefaultSeed){set.seed(sum(obs))}
 
   # final output
-  df <- data.frame(function_used = "",
-                   n = obs_count,
-                   max_obs = NA,
-                   mean = NA,
-                   sd = NA,
-                   median = NA,
-                   epc = NA,
-                   mean_lci = NA,
-                   mean_uci = NA,
-                   notes = "",
-                   qcontrol = "",
-                   normal_dist = NA,
-                   lognorm_dist = NA,
-                   gamma_dist = NA,
-                   best_dist = "NA",
-                   dist_iqr = "NA",
-                   mean_ci = "")
+  output <- list(function_used = "",
+                 n = obs_count,
+                 max_obs = NA,
+                 mean = NA,
+                 sd = NA,
+                 median = NA,
+                 epc = NA,
+                 mean_lci = NA,
+                 mean_uci = NA,
+                 notes = "",
+                 qcontrol = "",
+                 normal_dist = NA,
+                 lognorm_dist = NA,
+                 gamma_dist = NA,
+                 best_dist = "NA",
+                 dist_iqr = "NA",
+                 mean_ci = "")
 
-
-  if (detected_count > 0){
+  if(detected_count > 0){
     unique_detected_values <- unique(obs[!cen])
     unique_detected_count <- length(unique_detected_values)
     max_detected_value <- signif(max(unique_detected_values), sigfig)
-    df$max_obs <- max_detected_value
+    output$max_obs <- max_detected_value
 
     #Do an initial screen for nondetects greater than the maximum detected value.
     #Remove any that are present and add a quality control flag
     if (nondetect_count > 0){
       nondetect_above_max_detect_count <- sum(obs > max_detected_value & cen)
       if(nondetect_above_max_detect_count > 0){
-        df$qcontrol <- message_breaks(df$qcontrol, "The imported data contained nondetects with concentrations greater than the maximum detected concentration. These records were removed prior to completing the EPC calculations. See Section 3.1 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+        output$qcontrol <- message_breaks(output$qcontrol, "The imported data contained nondetects with concentrations greater than the maximum detected concentration. These records were removed prior to completing the EPC calculations. See Section 3.1 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
 
         #remove data and redefine initial variables
 
@@ -118,7 +125,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
           unique_detected_count <- length(unique_detected_values)
         }
 
-        df$n = obs_count
+        output$n = obs_count
 
       }
     }
@@ -127,24 +134,24 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
   #perform initial screening for conditions that don't allow for 95UCL calculation
   if(detected_count == 0){ #if not detected, we use maximum censoring limit
 
-    df$epc <- signif(max(obs), sigfig)
-    df$function_used <- "no_detections"
-    df$notes <- "This dataset did not contain any detected results, so an EPC could not be calculated. Use the maximum censoring limit."
-    return(df)
+    output$epc <- signif(max(obs), sigfig)
+    output$function_used <- "no_detections"
+    output$notes <- "This dataset did not contain any detected results, so an EPC could not be calculated. Use the maximum censoring limit."
+    return(output)
 
   } else if(detected_count < 4) { #if less than 4 detected, we use max detected
 
-    df$epc <- max_detected_value
-    df$function_used <- "max_less_than_4_detections"
-    df$notes <- message_breaks(df$notes, "This dataset contained less than four detections, so the EPC is equal to the maximum detected value.")
-    return(df)
+    output$epc <- max_detected_value
+    output$function_used <- "max_less_than_4_detections"
+    output$notes <- message_breaks(output$notes, "This dataset contained less than four detections, so the EPC is equal to the maximum detected value.")
+    return(output)
 
   } else if(nondetect_percent >= 0.8){ #if equal/more than 80% non-detected, we use max detected
 
-    df$epc <- max_detected_value
-    df$function_used <- "max_80_percent_or_more_non_detects"
-    df$notes <- message_breaks(df$notes, "This dataset contained 80% or more non-detects, so the EPC is equal to the maximum detected value.")
-    return(df)
+    output$epc <- max_detected_value
+    output$function_used <- "max_80_percent_or_more_non_detects"
+    output$notes <- message_breaks(output$notes, "This dataset contained 80% or more non-detects, so the EPC is equal to the maximum detected value.")
+    return(output)
 
   }
 
@@ -152,15 +159,15 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
   if(obs_count < 8){ #if less than 8 obs, we use the max
 
-    df$epc <- max_detected_value
-    df$function_used <- "max_less_than_8_records"
-    df$notes <- message_breaks(df$notes, "This dataset contained less than eight records, so the EPC is equal to the maximum detected value.")
+    output$epc <- max_detected_value
+    output$function_used <- "max_less_than_8_records"
+    output$notes <- message_breaks(output$notes, "This dataset contained less than eight records, so the EPC is equal to the maximum detected value.")
 
   } else if(unique_detected_count < 3){ #if less than 3 unique detected, we use the max
 
-    df$epc <- max_detected_value
-    df$function_used <- "max_fewer_than_3_unique_detections"
-    df$notes <- message_breaks(df$notes, "This dataset contained fewer than three unique detected values, so the EPC is equal to the maximum detected value.")
+    output$epc <- max_detected_value
+    output$function_used <- "max_fewer_than_3_unique_detections"
+    output$notes <- message_breaks(output$notes, "This dataset contained fewer than three unique detected values, so the EPC is equal to the maximum detected value.")
 
   } else if(obs_count >= 20){ #20 or more values requires bootstrapping
 
@@ -172,54 +179,54 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
       if(length(pexceed) == 1 | stats::var(pexceed) == 0) {
 
         distData <- EnvStats::elnormAltCensored(obs, cen, method = "rROS", ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap" , n.bootstraps = 5000, conf.level = conf.level)
-        df$function_used <- "lognormalBootstrap_95ucl"
+        output$function_used <- "lognormalBootstrap_95ucl"
 
       } else {
 
         distData <- EnvStats::enparCensored(obs, cen, ci = TRUE, ci.type = "two-sided", ci.method = "bootstrap", n.bootstraps = 5000, conf.level = conf.level)
-        df$function_used <- "bootstrap_95ucl"
+        output$function_used <- "bootstrap_95ucl"
 
       }
 
-      df$epc <- as.numeric(distData$interval$limits["Pct.UCL"])
-      df$mean <- as.numeric(distData$parameters["mean"])
-      df$mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
+      output$epc <- as.numeric(distData$interval$limits["Pct.UCL"])
+      output$mean <- as.numeric(distData$parameters["mean"])
+      output$mean_lci <- signif(as.numeric(distData$interval$limits["Pct.LCL"]), sigfig)
 
-      if(df$function_used == "lognormalBootstrap_95ucl") {
+      if(output$function_used == "lognormalBootstrap_95ucl") {
         cv <- distData$parameters[[2]]
-        df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
-        df$median <- EnvStats::qlnormAlt(0.5, df$mean, cv) # Median, since it isn't directly reported
+        output$sd <- output$mean * cv # Standard deviation, since it isn't directly reported
+        output$median <- EnvStats::qlnormAlt(0.5, output$mean, cv) # Median, since it isn't directly reported
 
-        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig)
-        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig)
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, output$mean, cv), sigfig)
+        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, output$mean, cv), sigfig)
+        output$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
       }
-      if(df$function_used == "bootstrap_95ucl") {
+      if(output$function_used == "bootstrap_95ucl") {
         cv <- distData$parameters[[2]]
-        df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
-        df$median <- EnvStats::qlnormAlt(0.5, df$mean, cv) # keep as normal dist for now
+        output$sd <- output$mean * cv # Standard deviation, since it isn't directly reported
+        output$median <- EnvStats::qlnormAlt(0.5, output$mean, cv) # keep as normal dist for now
 
-        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig) # keep as normal dist for now
-        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig) # keep as normal dist for now
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, output$mean, cv), sigfig) # keep as normal dist for now
+        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, output$mean, cv), sigfig) # keep as normal dist for now
+        output$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
       }
 
     } else {
 
       bootoutput <- boot::boot(obs, function(x, index) mean(x[index]), 5000)
-      df$epc <- boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[5]]
-      df$mean <- mean(bootoutput$t)
-      df$mean_lci <- signif(boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[4]], sigfig)
-      df$median <- stats::median(bootoutput$t)
+      output$epc <- boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[5]]
+      output$mean <- mean(bootoutput$t)
+      output$mean_lci <- signif(boot::boot.ci(bootoutput, conf = conf.level, type = "perc")$percent[[4]], sigfig)
+      output$median <- stats::median(bootoutput$t)
       firstQuartile <- signif(stats::quantile(bootoutput$t, 0.25), sigfig)
       thirdQuartile <- signif(stats::quantile(bootoutput$t, 0.75), sigfig)
-      df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
-      df$function_used <- "bootstrap_95ucl"
+      output$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+      output$function_used <- "bootstrap_95ucl"
 
     }
 
     # mean confidence interval
-    df$mean_uci <- signif(df$epc, sigfig)
+    output$mean_uci <- signif(output$epc, sigfig)
 
   } else { #between 8 and 19
 
@@ -232,9 +239,9 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
       gamma_dist <- ppcc[4]
       normal_dist <- ppcc[11]
 
-      df$lognorm_dist <- signif(lognorm_dist, sigfig)
-      df$gamma_dist <- signif(gamma_dist, sigfig)
-      df$normal_dist <- signif(normal_dist, sigfig)
+      output$lognorm_dist <- signif(lognorm_dist, sigfig)
+      output$gamma_dist <- signif(gamma_dist, sigfig)
+      output$normal_dist <- signif(normal_dist, sigfig)
 
     } else {
 
@@ -251,9 +258,9 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
       p_gamma <- gamma_w$p.value
       p_normal <- normal_w$p.value
 
-      df$lognorm_dist <- paste0(signif(lognorm_dist, sigfig), " (p = ", signif(p_lognorm, sigfig), ")")
-      df$gamma_dist <- paste0(signif(gamma_dist, sigfig), " (p = ", signif(p_gamma, sigfig), ")")
-      df$normal_dist <- paste0(signif(normal_dist, sigfig), " (p = ", signif(p_normal, sigfig), ")")
+      output$lognorm_dist <- paste0(signif(lognorm_dist, sigfig), " (p = ", signif(p_lognorm, sigfig), ")")
+      output$gamma_dist <- paste0(signif(gamma_dist, sigfig), " (p = ", signif(p_gamma, sigfig), ")")
+      output$normal_dist <- paste0(signif(normal_dist, sigfig), " (p = ", signif(p_normal, sigfig), ")")
 
     }
 
@@ -282,7 +289,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
       if(max_stat == normal_dist && isFALSE(checkedNormalDistribution) && testForNormal){
 
-        df$best_dist <- "Normal"
+        output$best_dist <- "Normal"
 
         if(nondetect_count > 0){
 
@@ -296,25 +303,25 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         }
 
-        df$function_used <- "normal_95ucl"
-        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
-        df$mean <- distData[["parameters"]][["mean"]]
+        output$function_used <- "normal_95ucl"
+        output$epc <- distData[["interval"]][["limits"]][["UCL"]]
+        output$mean <- distData[["parameters"]][["mean"]]
 
-        df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
-        df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
+        output$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
+        output$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
 
-        df$sd <- distData[["parameters"]][["sd"]]
-        df$median <- stats::qnorm(0.5, df$mean, df$sd)
+        output$sd <- distData[["parameters"]][["sd"]]
+        output$median <- stats::qnorm(0.5, output$mean, output$sd)
 
-        firstQuartile <- signif(stats::qnorm(0.25, df$mean, df$sd), sigfig)
-        thirdQuartile <- signif(stats::qnorm(0.75, df$mean, df$sd), sigfig)
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        firstQuartile <- signif(stats::qnorm(0.25, output$mean, output$sd), sigfig)
+        thirdQuartile <- signif(stats::qnorm(0.75, output$mean, output$sd), sigfig)
+        output$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedNormalDistribution <- TRUE
 
       } else if(max_stat == gamma_dist && isFALSE(checkedGammaDistribution)){
 
-        df$best_dist <- "Gamma"
+        output$best_dist <- "Gamma"
 
         if(nondetect_count > 0){
 
@@ -328,28 +335,28 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         }
 
-        df$function_used = "gamma_95ucl"
+        output$function_used = "gamma_95ucl"
 
-        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
-        df$mean <- distData[["parameters"]][["mean"]]
+        output$epc <- distData[["interval"]][["limits"]][["UCL"]]
+        output$mean <- distData[["parameters"]][["mean"]]
 
-        df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
-        df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
+        output$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
+        output$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
 
         cv <- distData$parameters[[2]]
-        df$sd <- df$mean * cv
-        df$median <- EnvStats::qgammaAlt(0.5, df$mean, cv)
+        output$sd <- output$mean * cv
+        output$median <- EnvStats::qgammaAlt(0.5, output$mean, cv)
 
-        firstQuartile <- signif(EnvStats::qgammaAlt(0.25, df$mean, cv), sigfig)
-        thirdQuartile <- signif(EnvStats::qgammaAlt(0.75, df$mean, cv), sigfig)
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"\u2014", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        firstQuartile <- signif(EnvStats::qgammaAlt(0.25, output$mean, cv), sigfig)
+        thirdQuartile <- signif(EnvStats::qgammaAlt(0.75, output$mean, cv), sigfig)
+        output$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","),"\u2014", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum( signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedGammaDistribution <- TRUE
 
       } else if(max_stat == lognorm_dist && isFALSE(checkedLognormalDistribution)){
 
-        df$best_dist <- "Lognormal"
-        df$function_used = "lognormal_95ucl"
+        output$best_dist <- "Lognormal"
+        output$function_used = "lognormal_95ucl"
 
         if(nondetect_count > 0){
 
@@ -363,37 +370,37 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         }
 
-        df$epc <- distData[["interval"]][["limits"]][["UCL"]]
-        df$mean <- distData[["parameters"]][["mean"]]
+        output$epc <- distData[["interval"]][["limits"]][["UCL"]]
+        output$mean <- distData[["parameters"]][["mean"]]
 
-        df$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
-        df$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
+        output$mean_lci <- signif(ci_90$interval$limits[[1]], sigfig)
+        output$mean_uci<- signif(ci_90$interval$limits[[2]], sigfig)
 
         cv <- distData$parameters[[2]]
-        df$sd <- df$mean * cv # Standard deviation, since it isn't directly reported
-        df$median <- EnvStats::qlnormAlt(0.5, df$mean, cv) # Median, since it isn't directly reported
+        output$sd <- output$mean * cv # Standard deviation, since it isn't directly reported
+        output$median <- EnvStats::qlnormAlt(0.5, output$mean, cv) # Median, since it isn't directly reported
 
-        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, df$mean, cv), sigfig)
-        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, df$mean, cv), sigfig)
-        df$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
+        firstQuartile <- signif(EnvStats::qlnormAlt(0.25, output$mean, cv), sigfig)
+        thirdQuartile <- signif(EnvStats::qlnormAlt(0.75, output$mean, cv), sigfig)
+        output$dist_iqr <- paste0(prettyNum(firstQuartile, big.mark = ","), "\u2013", prettyNum(thirdQuartile, big.mark = ","), " (", prettyNum(signif(thirdQuartile-firstQuartile, sigfig), big.mark = ","), ")")
 
         checkedLognormalDistribution <- TRUE
 
       } else {
 
-        df$function_used <- "there_was_an_error"
+        output$function_used <- "there_was_an_error"
         break
 
       }
 
-      if (df$mean < max_detected_value) {
+      if (output$mean < max_detected_value) {
 
         success <- TRUE
         break
 
       } else {
 
-        df$qcontrol <- message_breaks(df$qcontrol, "The model estimated mean for the best fitting distribution was greater than the maximum detected value, so the EPC was evaluated using the next best fitting distribution instead. See Section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+        output$qcontrol <- message_breaks(output$qcontrol, "The model estimated mean for the best fitting distribution was greater than the maximum detected value, so the EPC was evaluated using the next best fitting distribution instead. See Section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
 
       }
 
@@ -411,22 +418,22 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
           if(is.na(max_stat)){
 
-            df$epc <- max_detected_value
-            df$function_used <- "max_data_did_not_fit_any_distribution"
+            output$epc <- max_detected_value
+            output$function_used <- "max_data_did_not_fit_any_distribution"
 
-            default_error_message <- paste(df$notes,"error or did not fit any model")
+            default_error_message <- paste(output$notes,"error or did not fit any model")
 
             if(nondetect_count > 0){
 
               if(max(unique_detected_values) < max(obs)){
 
-                df$notes <- message_breaks(df$notes, "The data did not fit any distribution and all detected values are less than the maximum censoring limit, so the maximum detected value was used for the EPC.")
+                output$notes <- message_breaks(output$notes, "The data did not fit any distribution and all detected values are less than the maximum censoring limit, so the maximum detected value was used for the EPC.")
 
               }
 
               else {
 
-                df$notes <- default_error_message
+                output$notes <- default_error_message
 
               }
 
@@ -434,7 +441,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
             else {
 
-              df$notes <- default_error_message
+              output$notes <- default_error_message
 
             }
 
@@ -442,9 +449,9 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
         } else {
 
-          df$epc <- max_detected_value
-          df$function_used <- "max_mean_greater_than_max_detect"
-          df$qcontrol <- message_breaks(df$qcontrol, "The model estimated mean was greater than the maximum detected value. Tried using other distributions but all distributions failed to have the model estimated mean be less than the max detected value. Reverting to maximum.")
+          output$epc <- max_detected_value
+          output$function_used <- "max_mean_greater_than_max_detect"
+          output$qcontrol <- message_breaks(output$qcontrol, "The model estimated mean was greater than the maximum detected value. Tried using other distributions but all distributions failed to have the model estimated mean be less than the max detected value. Reverting to maximum.")
 
           #added to break for loop
           break
@@ -455,7 +462,7 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
 
     } #end of for loop
 
-    if(df$function_used == "normal_95ucl"){
+    if(output$function_used == "normal_95ucl"){
 
       testZ <- stats::pnorm(-3, mean = 0, 1)
       testValues <- stats::pnorm(0, mean = distData$parameters[[1]], sd = distData$parameters[[2]])
@@ -473,90 +480,90 @@ calculate_epc <- function(obs = NULL, cen = NULL, conf.level = 0.90, sigfig = 4,
   ros_df <- as.data.frame(NADA::ros(obs, as.logical(cen)))
   average_value <- mean(ros_df$modeled, na.rm = TRUE)
 
-  if(!is.na(df$epc) & substr(df$function_used, 1, 3) != "max"){
+  if(!is.na(output$epc) & substr(output$function_used, 1, 3) != "max"){
 
-    if(df$epc > max_detected_value){
+    if(output$epc > max_detected_value){
 
       if (obs_count >= 20) {
 
-        df$qcontrol <- message_breaks(df$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was larger than the maximum detected value. Because the dataset contains 20 or more records, the maximum value was used as the EPC instead of the 95UCL. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
-        df$epc <- max_detected_value
-        df$function_used <- "max_95ucl_larger_than_max_value"
+        output$qcontrol <- message_breaks(output$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was larger than the maximum detected value. Because the dataset contains 20 or more records, the maximum value was used as the EPC instead of the 95UCL. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+        output$epc <- max_detected_value
+        output$function_used <- "max_95ucl_larger_than_max_value"
 
       } else if (obs_count < 20 & obs_count >= 8) {
 
-        df$qcontrol <- message_breaks(df$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was larger than the maximum detected value. Because the dataset contains between 8 and 19 records, the 95UCL was used as the EPC. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+        output$qcontrol <- message_breaks(output$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was larger than the maximum detected value. Because the dataset contains between 8 and 19 records, the 95UCL was used as the EPC. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
 
       }
 
-    } else if(df$epc < average_value){
+    } else if(output$epc < average_value){
 
-      df$qcontrol <- message_breaks(df$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was less than the average value of this dataset. As a result, the maximum was used as the EPC. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
-      df$epc <- max_detected_value
-      df$function_used <- "max_95ucl_less_than_average_value"
+      output$qcontrol <- message_breaks(output$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was less than the average value of this dataset. As a result, the maximum was used as the EPC. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+      output$epc <- max_detected_value
+      output$function_used <- "max_95ucl_less_than_average_value"
 
-    } else if(df$epc > (3*average_value)){
+    } else if(output$epc > (3*average_value)){
 
-      df$qcontrol <- message_breaks(df$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was more than three times the average value of this dataset. The 95UCL was used as the EPC for this dataset but should be verified. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+      output$qcontrol <- message_breaks(output$qcontrol,"The estimated 95th percentile upper confidence limit of the mean (95UCL) for this dataset was more than three times the average value of this dataset. The 95UCL was used as the EPC for this dataset but should be verified. See section 3.7 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
 
     }
 
   }
 
   #Check for case where called functions returned NaN or Inf
-  if(is.na(df$epc) || is.nan(df$epc) || is.infinite(df$epc)){
+  if(is.na(output$epc) || is.nan(output$epc) || is.infinite(output$epc)){
 
-    df$function_used <- "EPC_not_calculated_due_to_NaN_or_Inf"
+    output$function_used <- "EPC_not_calculated_due_to_NaN_or_Inf"
   }
 
   #Finalize notes
-  if(df$function_used == "bootstrap_95ucl"){
+  if(output$function_used == "bootstrap_95ucl"){
 
-    df$notes <- message_breaks(df$notes, "This dataset contained 20 or more records, so the EPC was calculated using bootstrap sampling.")
+    output$notes <- message_breaks(output$notes, "This dataset contained 20 or more records, so the EPC was calculated using bootstrap sampling.")
 
-  } else if(df$function_used == "lognormalBootstrap_95ucl"){
+  } else if(output$function_used == "lognormalBootstrap_95ucl"){
 
-    df$notes <- message_breaks(df$notes, "This dataset contained 20 or more records. The data are either singly censored or have multiple censoring limits with no interspersed levels, so the EPC was calculated using bootstrap sampling of a lognormal distribution with regression on order statistics.")
+    output$notes <- message_breaks(output$notes, "This dataset contained 20 or more records. The data are either singly censored or have multiple censoring limits with no interspersed levels, so the EPC was calculated using bootstrap sampling of a lognormal distribution with regression on order statistics.")
 
-  } else if(df$function_used == "normal_95ucl"){
+  } else if(output$function_used == "normal_95ucl"){
 
-    df$notes <- message_breaks(df$notes, "This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, so the EPC was calculated assuming a normal distribution.")
+    output$notes <- message_breaks(output$notes, "This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, so the EPC was calculated assuming a normal distribution.")
 
-  } else if(df$function_used == "lognormal_95ucl"){
+  } else if(output$function_used == "lognormal_95ucl"){
 
     if(testForNormal){
 
-      df$notes <- message_breaks(df$notes,"This dataset contained between 8 and 19 records. A lognormal distribution best fit the imported data, so the EPC was calculated assuming a lognormal distribution.")
+      output$notes <- message_breaks(output$notes,"This dataset contained between 8 and 19 records. A lognormal distribution best fit the imported data, so the EPC was calculated assuming a lognormal distribution.")
 
     } else {
 
-      df$qcontrol <- message_breaks(df$qcontrol, "The normal distribution best fit the imported data, but it included unrealistic values so the next best-fitting distribution was used instead. See Section 3.5 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
-      df$notes <- message_breaks(df$notes,"This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, but the assumed distribution contained unrealistic values. The lognormal distribution was the next best-fitting distribution, so the EPC was calculated assuming a lognormal distribution.")
+      output$qcontrol <- message_breaks(output$qcontrol, "The normal distribution best fit the imported data, but it included unrealistic values so the next best-fitting distribution was used instead. See Section 3.5 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+      output$notes <- message_breaks(output$notes,"This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, but the assumed distribution contained unrealistic values. The lognormal distribution was the next best-fitting distribution, so the EPC was calculated assuming a lognormal distribution.")
 
     }
 
-  } else if (df$function_used == "gamma_95ucl"){
+  } else if (output$function_used == "gamma_95ucl"){
 
     if(testForNormal){
 
-      df$notes <- message_breaks(df$notes,"This dataset contained between 8 and 19 records. A gamma distribution best fit the imported data, so the EPC was calculated assuming a gamma distribution.")
+      output$notes <- message_breaks(output$notes,"This dataset contained between 8 and 19 records. A gamma distribution best fit the imported data, so the EPC was calculated assuming a gamma distribution.")
 
     } else {
 
-      df$qcontrol <- message_breaks(df$qcontrol, "The normal distribution best fit the imported data, but it included unrealistic values so the next best-fitting distribution was used instead. See Section 3.5 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
-      df$notes <- message_breaks(df$notes,"This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, but the assumed distribution contained unrealistic values. The gamma distribution was the next best-fitting distribution, so the EPC was calculated assuming a gamma distribution.")
+      output$qcontrol <- message_breaks(output$qcontrol, "The normal distribution best fit the imported data, but it included unrealistic values so the next best-fitting distribution was used instead. See Section 3.5 of ATSDR's EPC Guidance for Discrete Sampling for further information.")
+      output$notes <- message_breaks(output$notes,"This dataset contained between 8 and 19 records. A normal distribution best fit the imported data, but the assumed distribution contained unrealistic values. The gamma distribution was the next best-fitting distribution, so the EPC was calculated assuming a gamma distribution.")
 
     }
   }
 
-  if(df$qcontrol != ""){
+  if(output$qcontrol != ""){
 
-    df$notes = message_breaks(df$notes, "See this dataset's quality control flag for further information about the calculated EPC.")
+    output$notes = message_breaks(output$notes, "See this dataset's quality control flag for further information about the calculated EPC.")
 
   }
 
-  df$mean_ci <- paste0(" (", prettyNum(df$mean_lci, big.mark = ","), "\u2014", prettyNum(df$mean_uci, big.mark = ","), ")")
+  output$mean_ci <- paste0(" (", prettyNum(output$mean_lci, big.mark = ","), "\u2014", prettyNum(output$mean_uci, big.mark = ","), ")")
 
-  return(df)
+  return(output)
 
 }

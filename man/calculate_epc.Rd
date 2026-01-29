@@ -5,8 +5,8 @@
 \title{Calculate Exposure Point Concentrations (EPCs)}
 \usage{
 calculate_epc(
-  obs = NULL,
-  cen = NULL,
+  obs,
+  cen,
   conf.level = 0.9,
   sigfig = 4,
   testForNormal = TRUE,
@@ -30,7 +30,7 @@ calculate_epc(
 \item{warnings}{Logical. Do you want warnings?}
 }
 \value{
-A data.frame class object.
+A list class object.
 \itemize{
 \item \code{function_used}: the character string representing the type of calculation used for the EPC.
 \item \code{n}: numeric value for sample size used for EPC..
