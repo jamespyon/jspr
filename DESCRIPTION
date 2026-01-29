@@ -15,7 +15,8 @@ Imports:
     dplyr,
     ggplot2,
     ggpubr,
-    rlang
+    rlang,
+    stringr
 Suggests:
     testthat (>= 3.0.0),
     tidyverse,
