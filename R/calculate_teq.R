@@ -181,10 +181,14 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
       }
 
       # sensitivity analysis
-      teq_lwr <- sum(ifelse(dioxin_data$cen, 0, dioxin_data$tec), na.rm = TRUE)
-      teq_uppr <- sum(dioxin_data$tec, na.rm = TRUE)
+      sens_data <- dioxin_data[,c("tec", "cen")]
+      sens_data$tec_0 <- sens_data$tec
+      sens_data$tec_0[sens_data$cen] <- 0
+      teq_lwr <- sum(sens_data$tec_0, na.rm = TRUE)
+      teq_uppr <- sum(sens_data$tec, na.rm = TRUE)
 
-      output$rpd <- abs((teq_uppr - teq_lwr) / ((teq_uppr + teq_lwr)/2)) |> signif(sigfig)
+      rpd <- abs((teq_uppr - teq_lwr) / ((teq_uppr + teq_lwr)/2))
+      output$rpd <- signif(rpd, sigfig)
 
       if(output$rpd > 0.5) {
 
