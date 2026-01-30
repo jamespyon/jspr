@@ -134,9 +134,7 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
       #if statement confirms that no detected records match the min TEC.
       #If they don't, the minimum value is a non-detect and one instance of it should be changed
       #If they do, no need to change anything even if a minimum value is also a nondetect
-      any(dioxin_data[!dioxin_data$cen,]$tec == tec_min)
-
-      if(any(dioxin_data[!dioxin_data$cen,]$tec == tec_min)) {
+      if(!any(dioxin_data[!dioxin_data$cen,]$tec == tec_min)) {
 
         #Find the first instance of the TEC equal to the min (should be all nondetects at this stage)s
         dioxin_data[min(which(dioxin_data$tec == tec_min)), ]$cen_for_km <- FALSE # should be false?
@@ -147,7 +145,7 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
       #if statement confirms that no detected records match the max TEC.
       #If they don't, the maximum value is a non-detect and one instance of it should be changed
       #If they do, no need to change anything even if a maximum value is also a nondetect
-      if(any(dioxin_data[!dioxin_data$cen,]$tec == tec_max)) {
+      if(!any(dioxin_data[!dioxin_data$cen,]$tec == tec_max)) {
 
         #Find the first instance of the TEC equal to the max (should be all nondetects at this stage)s
         dioxin_data[min(which(dioxin_data$tec == tec_max)), ]$cen_for_km <- FALSE # should be false?
