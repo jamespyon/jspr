@@ -57,7 +57,7 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
 
   # check cas for dioxins
   casrn <- fix_casrn(casrn)
-  dioxin_casrns <- intersect(tef_congener$casrn, casrn)
+  dioxin_casrns <- intersect(jspr::tef_congener$casrn, casrn)
   dioxin_present <- length(dioxin_casrns) > 0
 
   # final output
@@ -87,9 +87,9 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
     # create dataframe
     # filter down to just dioxins (contaminants with TECs)
     input_data <- data.frame(obs, cen, casrn)
-    dioxin_data <- dplyr::left_join(input_data, tef_congener, by = "casrn")
-    dioxin_data <- dplyr::filter(dioxin_data, !is.na(tef))
-    dioxin_data <- dplyr::mutate(dioxin_data, tec = obs*tef)
+    dioxin_data <- merge(input_data, jspr::tef_congener[,c("casrn", "tef")], by = "casrn")
+    dioxin_data <- dioxin_data[!is.na(dioxin_data$tef),]
+    dioxin_data$tec <- dioxin_data$obs*dioxin_data$tef
 
     # pre-processing after filtering
     obs_count <- length(dioxin_data$obs)
@@ -107,7 +107,7 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
 
 
     # Sum the TECs and determine the fraction that comes from nondetects.
-    dioxin_data_nd <- dioxin_data |> dplyr::filter(cen)
+    dioxin_data_nd <- dioxin_data[dioxin_data$cen,]
     sum_tec_nd <- sum(dioxin_data_nd$tec)
     sum_tec_all <- sum(dioxin_data$tec)
     nd_tec_ratio <- sum_tec_nd/sum_tec_all
@@ -134,7 +134,9 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
       #if statement confirms that no detected records match the min TEC.
       #If they don't, the minimum value is a non-detect and one instance of it should be changed
       #If they do, no need to change anything even if a minimum value is also a nondetect
-      if(nrow(dplyr::filter(dioxin_data, !cen & tec == tec_min)) == 0) {
+      any(dioxin_data[!dioxin_data$cen,]$tec == tec_min)
+
+      if(any(dioxin_data[!dioxin_data$cen,]$tec == tec_min)) {
 
         #Find the first instance of the TEC equal to the min (should be all nondetects at this stage)s
         dioxin_data[min(which(dioxin_data$tec == tec_min)), ]$cen_for_km <- FALSE # should be false?
@@ -145,7 +147,7 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
       #if statement confirms that no detected records match the max TEC.
       #If they don't, the maximum value is a non-detect and one instance of it should be changed
       #If they do, no need to change anything even if a maximum value is also a nondetect
-      if(nrow(dplyr::filter(dioxin_data, !cen & tec == tec_max)) == 0) {
+      if(any(dioxin_data[!dioxin_data$cen,]$tec == tec_max)) {
 
         #Find the first instance of the TEC equal to the max (should be all nondetects at this stage)s
         dioxin_data[min(which(dioxin_data$tec == tec_max)), ]$cen_for_km <- FALSE # should be false?
@@ -157,9 +159,7 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
     # if all are detects or there are less than three detects, sum TECs to get the TEQ
     if(sum(dioxin_data$cen) == 0 | detected_count < 3) {
 
-      teq <- dioxin_data |>
-        dplyr::summarize(teq = sum(tec, na.rm = TRUE)) |>
-        dplyr::slice(1)
+      teq <- sum(dioxin_data$tec, na.rm = TRUE)
 
       output$teq <- signif(teq, sigfig)
 
@@ -169,36 +169,25 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
       #There's a chance that all the nondetects are now detects after the flag switching above. If so do calculations assuming all detects but still test sensitivity
       if(sum(dioxin_data$cen_for_km) == 0){
 
-        teq <- dioxin_data |>
-          dplyr::summarize(teq = sum(tec, na.rm = TRUE)) |>
-          dplyr::slice(1)
+        teq <- sum(dioxin_data$tec, na.rm = TRUE)
 
         output$teq <- signif(teq, sigfig)
 
       } else {
 
         #else we still have at least one nondetect, so enparCensored shouldn't throw an error
-        teq <- dioxin_data |>
-          dplyr::summarize(teq = EnvStats::enparCensored(tec, cen_for_km)$parameters[[1]]*dplyr::n())|>
-          dplyr::slice(1)
+        teq <- EnvStats::enparCensored(dioxin_data$tec, dioxin_data$cen_for_km)$parameters[[1]]*nrow(dioxin_data)
 
         output$teq <- signif(teq, sigfig)
 
       }
 
       # sensitivity analysis
-      teq_lwr <- dioxin_data |>
-        dplyr::mutate(tec = ifelse(cen, 0, tec)) |>
-        dplyr::summarize(teq = sum(tec, na.rm = TRUE)) |>
-        dplyr::slice(1)
+      teq_lwr <- dioxin_data$tec
+      teq_lwr <- sum(teq_lwr, na.rm = TRUE)
+      teq_uppr <- sum(dioxin_data$tec, na.rm = TRUE)
 
-      teq_uppr <- dioxin_data |>
-        dplyr::summarize(teq = sum(tec, na.rm = TRUE)) |>
-        dplyr::slice(1)
-
-
-
-      output$rpd <- abs((teq_uppr$teq - teq_lwr$teq) / ((teq_uppr$teq + teq_lwr$teq)/2)) |> signif(sigfig)
+      output$rpd <- abs((teq_uppr - teq_lwr) / ((teq_uppr + teq_lwr)/2)) |> signif(sigfig)
 
       if(output$rpd > 0.5) {
 
@@ -219,9 +208,6 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
     } else { # if at least one of the samples had an RPD flag
 
       # check if RPD was the max for the exposure unit/media group
-      rpd_max_df <- dioxin_data |>
-        dplyr::filter(rpd_flag != "")
-
       rpd_max <- max(output$rpd, na.rm = TRUE)
       teq_max <- max(output$teq, na.rm = TRUE)
 
