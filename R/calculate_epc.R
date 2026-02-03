@@ -107,8 +107,8 @@ calculate_epc <- function(obs, cen, conf.level = 0.90, sigfig = 4, testForNormal
         #remove data and redefine initial variables
 
         #redefine the initial data used in the calculations
-        new_obs <- obs[obs<max_detected_value]
-        new_cen <- cen[obs<max_detected_value]
+        new_obs <- obs[!(cen & obs > max_detected_value)]
+        new_cen <- cen[!(cen & obs > max_detected_value)]
 
         obs <- new_obs
         cen <- new_cen
