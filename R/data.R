@@ -42,3 +42,15 @@
 "pef_congener"
 
 
+#' Mission Area Categories and Keywords
+#'
+#' Mission Area Categories and Keywords
+#'
+#' @format An 262 x 2 data frame:
+#' \describe{
+#'   \item{category}{Mission Area Categories}
+#'   \item{use_for}{Description of Mission Area Categories}
+#'   \item{keyword}{Mission Area Keywords}
+#' }
+#'
+"mission_area"

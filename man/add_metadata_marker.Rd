@@ -5,35 +5,42 @@
 \title{Insert Metadata Marker into README.md File}
 \usage{
 add_metadata_marker(
-  contact_email,
+  contact_email = NULL,
   org = "ATSDR",
-  version = NA,
+  keywords,
   status = c("Maintained", "Deprecated"),
-  keywords = NA,
-  labor_hours = NA,
-  contract = NA,
-  exemption = NA,
-  exemption_justification = NA
+  version = NULL,
+  labor_hours = NULL,
+  contract = NULL,
+  exemption = c("exemptByLaw", "exemptByNationalSecurity", "exemptByAgencySystem",
+    "exemptByMissionSystem", "exemptByCIO", "exemptNonCode"),
+  exemption_justification = NULL,
+  file = NULL,
+  overwrite = FALSE
 )
 }
 \arguments{
-\item{contact_email}{Email for metadata or repository inquiries. CDC ID will also work.}
+\item{contact_email}{Email for metadata or repository inquiries (REQUIRED). CDC ID will also work. If NULL, it will coerce one from your system.}
 
-\item{org}{Name of CDC division, center, or office.}
+\item{org}{Name of CDC division, center, or office (REQUIRED). Default is "ATSDR".}
 
-\item{version}{Current release version of the software.}
+\item{keywords}{Comma-separated list of technologies, domains, or topics (REQUIRED). Must match with valid Mission Area keywords.}
 
-\item{status}{Project development status (e.g., Maintained, Deprecated).}
+\item{status}{Project development status (e.g., Maintained, Deprecated) (if applicable).}
 
-\item{keywords}{Comma-separated list of technologies, domains, or topics.}
+\item{version}{Current release version of the software(if applicable).}
 
-\item{labor_hours}{Estimated total person-hours for development.}
+\item{labor_hours}{Estimated total person-hours for development(if applicable).}
 
 \item{contract}{Contract number associated with the project (if applicable).}
 
-\item{exemption}{One of the five allowed values for restricted access.}
+\item{exemption}{One of the five allowed values for restricted access (if applicable).}
 
-\item{exemption_justification}{Required explanation if an exemption is claimed. Use "ei" for EI group specific justification.}
+\item{exemption_justification}{Required explanation if an exemption is claimed (use when exemption is used). Use "ei" for Exposure Investigation group specific justification.}
+
+\item{file}{The filepath for the README.md file, if your README file is not in the same directory as your working directory.}
+
+\item{overwrite}{Do you want to overwrite the metadata marker?}
 }
 \value{
 An edit to the README.md file of the repository of the project you are in.
@@ -42,18 +49,20 @@ An edit to the README.md file of the repository of the project you are in.
 Add metadata marker based on SHARE IT Act of 2024 to be read by OCIO AI scanner. To be used as is and not in a script (e.g. in the console of an RStudio workstation).
 }
 \details{
-\tabular{ll}{
+The minimum necessary metadata marker includes \code{contact_email}, \code{org}, and \code{keywords}. You must include these arguments at the minimum.
+
+Here is a list of all Exemptions and their descriptions.\tabular{ll}{
    Exemption \tab Description \cr
-   exemptByLaw \tab Code is exempt from sharing due to legal restrictions \cr
-   exemptByNationalSecurity \tab Code is exempt due to national security concerns \cr
-   exemptByAgencySystem \tab Code is exempt as it supports internal agency systems \cr
-   exemptByMissionSystem \tab Code is exempt as it supports critical mission operations \cr
-   exemptByCIO \tab Code has a special exemption approved by the CDC CIO \cr
+   \code{exemptByLaw} \tab Code is exempt from sharing due to legal restrictions \cr
+   \code{exemptByNationalSecurity} \tab Code is exempt due to national security concerns \cr
+   \code{exemptByAgencySystem} \tab Code is exempt as it supports internal agency systems \cr
+   \code{exemptByMissionSystem} \tab Code is exempt as it supports critical mission operations \cr
+   \code{exemptByCIO} \tab Code has a special exemption approved by the CDC CIO \cr
 }
 }
 \examples{
 \dontrun{
-add_metadata_marker("zzz0", exemption = "exemptByCIO", exemption_justification = "ei")
+add_metadata_marker("your@email.here", org = "YourOrg", keywords = c("your", "keywords", "here"))
 }
 
 }
