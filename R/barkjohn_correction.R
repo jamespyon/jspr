@@ -16,7 +16,12 @@
 
 barkjohn_correction <- function(x, rh, warnings = TRUE) {
 
-  jspr_warning("Relative Humidity units should be in %.\nPM2.5 units should be in ug/m3.", warnings)
+  # warning
+  if(warnings == TRUE) {
+    warning(paste("Relative Humidity units should be in %.",
+                  "PM2.5 units should be in ug/m3.",
+                  sep = "\n"))
+  }
 
 	if(any(is.na(c(x, rh)))){
 
