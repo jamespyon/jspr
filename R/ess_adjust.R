@@ -32,7 +32,12 @@
 
 ess_test <- function(x, y = NULL, alternative = c("two.sided", "less", "greater"), conf.level = 0.95, method = c("basic", "hsdda"), warnings = TRUE) {
 
-  jspr_warning("Only use function if you know your data has significant autocorrelation. You can check with stats::acf().", warnings)
+  # warnings
+  if(warnings == TRUE) {
+    warning(paste("Only use function if you know your data has significant autocorrelation.",
+                  "You can check with stats::acf().",
+                  sep = "\n"))
+  }
 
   # house keeping
   if(identical(method, c("basic", "hsdda"))) {method <- "hsdda"}

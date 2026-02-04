@@ -18,9 +18,11 @@ jspr_systime <- function() {
 
 }
 
-# function for iterative warnings
-jspr_warning <- function(message, warning = TRUE) {
+# function for finding user ID
+user_id <- function() {
 
-  if(warning == TRUE) {return(warning(message))}
+  string <- unname(Sys.info()["user"])
+
+  return(string)
 
 }
