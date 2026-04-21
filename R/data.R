@@ -54,3 +54,21 @@
 #' }
 #'
 "mission_area"
+
+#' PHAST Recommended CVs
+#'
+#' PHAST Recommended CVs
+#'
+#' @format A 2,126 × 6 data frame:
+#' \describe{
+#'   \item{contaminant}{Contaminant Name}
+#'   \item{casrn}{Contaminant CAS-Reference Number}
+#'   \item{cv}{Comparison Value}
+#'   \item{unit}{Comparison Value Unit of Measurement}
+#'   \item{cv_type}{Comparison Value Type}
+#'   \item{media}{Media/Matrix}
+#'   \item{phast_version}{PHAST version}
+#'   \item{database_rev}{Database Revision}
+#' }
+#'
+"atsdr_recommended_cv"
