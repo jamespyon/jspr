@@ -37,12 +37,14 @@ Calculate TEQs according to ATSDR Toxic Equivalents Procedure for Dioxin and Dio
 The function can be used in conjunction with dplyr \code{group_by()} and \code{summarise()} functions to output values not dependent on the CAS-RN inputted. Whether or not \code{casrn} argument has exactly only dioxin and DLC or a mix with other compounds, the function will only use values concerning dioxin and DLC, as long as the arguments are represented well.
 }
 \examples{
+#example of individual inputs
 results = rexp(n = 20, rate = 1)
 nondetects <- results<0.5
 congener <- rep(tef_congener$casrn, length.out = 20)
 
 calculate_teq(obs = results, cen = nondetects, casrn = congener)
 
+#example of dplyr verbs with dataframe
 library(tidyverse)
 
 congener <- rep(tef_congener$casrn, each = 2, length.out = 20)

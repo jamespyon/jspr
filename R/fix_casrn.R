@@ -35,14 +35,9 @@ fix_casrn <- function(casrn, format = c("xx-xx-x", "xxxxx")){
 
   for(x in unique(numeric_cas)) {
 
-    simple_cas <- stringr::str_replace_all(x, "-", "")
-    fun_seq <- as.integer(stringr::str_split_1(simple_cas, ""))
-    check_digit <- fun_seq[length(fun_seq)]
-    fun_seq <- fun_seq[-length(fun_seq)]
-    fun_i <- length(fun_seq):1
-    fun_seq_sum <- sum(fun_seq *fun_i)
+    casrn_logic <- is.casrn(x, warnings = FALSE)
 
-    if(fun_seq_sum %% 10 != check_digit) {
+    if(casrn_logic == FALSE) {
       stop(paste("False CAS-RN detected.", x, "is not a valid CAS-RN."))
     }
 
@@ -56,7 +51,7 @@ fix_casrn <- function(casrn, format = c("xx-xx-x", "xxxxx")){
   # format cas-rn
   if(format == "xx-xx-x") {
 
-    output <- cas_string
+    output <- gsub("^0*", "", cas_string)
 
   } else if(format == "xxxxx") {
 
@@ -65,5 +60,29 @@ fix_casrn <- function(casrn, format = c("xx-xx-x", "xxxxx")){
   }
 
   return(output)
+
+}
+
+is.casrn <- function(casrn, warnings = FALSE) {
+
+  simple_cas <- stringr::str_replace_all(casrn, "-", "")
+  fun_seq <- as.integer(stringr::str_split_1(simple_cas, ""))
+  check_digit <- fun_seq[length(fun_seq)]
+  fun_seq <- fun_seq[-length(fun_seq)]
+  fun_i <- length(fun_seq):1
+  fun_seq_sum <- sum(fun_seq *fun_i)
+
+  if(fun_seq_sum %% 10 != check_digit) {
+
+    if(warnings == TRUE) {
+      warning(paste("False CAS-RN detected.", casrn, "is not a valid CAS-RN."))
+    }
+    return(FALSE)
+
+  } else {
+
+    return(TRUE)
+
+  }
 
 }

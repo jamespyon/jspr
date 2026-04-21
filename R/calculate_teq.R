@@ -25,12 +25,14 @@
 #' @export
 #'
 #' @examples
+#' #example of individual inputs
 #' results = rexp(n = 20, rate = 1)
 #' nondetects <- results<0.5
 #' congener <- rep(tef_congener$casrn, length.out = 20)
 #'
 #' calculate_teq(obs = results, cen = nondetects, casrn = congener)
 #'
+#' #example of dplyr verbs with dataframe
 #' library(tidyverse)
 #'
 #' congener <- rep(tef_congener$casrn, each = 2, length.out = 20)
@@ -55,9 +57,14 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
                   sep = "\n"))
   }
 
+  #format tef_congener
+  tef_data <- jspr::tef_congener |>
+    dplyr::mutate(casrn = fix_casrn(casrn))
+
+
   # check cas for dioxins
   casrn <- fix_casrn(casrn)
-  dioxin_casrns <- intersect(jspr::tef_congener$casrn, casrn)
+  dioxin_casrns <- intersect(tef_data$casrn, casrn)
   dioxin_present <- length(dioxin_casrns) > 0
 
   # final output
@@ -87,7 +94,7 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
     # create dataframe
     # filter down to just dioxins (contaminants with TECs)
     input_data <- data.frame(obs, cen, casrn)
-    dioxin_data <- merge(input_data, jspr::tef_congener[,c("casrn", "tef")], by = "casrn")
+    dioxin_data <- merge(input_data, tef_data[,c("casrn", "tef")], by = "casrn")
     dioxin_data <- dioxin_data[!is.na(dioxin_data$tef),]
     dioxin_data$tec <- dioxin_data$obs*dioxin_data$tef
 
