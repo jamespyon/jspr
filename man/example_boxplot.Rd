@@ -15,7 +15,7 @@ example_boxplot(
   text.color = "black",
   title = "",
   caption = "",
-  warnings = TRUE
+  message = TRUE
 )
 }
 \arguments{
@@ -39,7 +39,7 @@ example_boxplot(
 
 \item{caption}{A character string for an optional caption.}
 
-\item{warnings}{Logical. Do you want warnings?}
+\item{message}{Logical. Do you want message?}
 }
 \value{
 A ggplot class object.

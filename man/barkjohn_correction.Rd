@@ -4,14 +4,14 @@
 \alias{barkjohn_correction}
 \title{Barkjohn Correction Factor for PurpleAir monitors}
 \usage{
-barkjohn_correction(x, rh, warnings = TRUE)
+barkjohn_correction(x, rh, message = TRUE)
 }
 \arguments{
 \item{x}{A value representing PurpleAir PM2.5 output.}
 
 \item{rh}{A value representing PurpleAir relative humidity.}
 
-\item{warnings}{A logical value. Change to remove warnings.}
+\item{message}{A logical value. Change to remove message.}
 }
 \value{
 A numeric class object

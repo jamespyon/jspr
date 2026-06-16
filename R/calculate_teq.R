@@ -10,7 +10,7 @@
 #' @param cen A logical vector pertaining to censoring of obs. TRUE if obs is censored.
 #' @param casrn A character vector representing the CAS-RN for each compound.
 #' @param sigfig A numeric value for the number of significant figures for the outputs of the function. Default is 4.
-#' @param warnings Logical. Do you want warnings?
+#' @param mesasge Logical. Do you want mesasge?
 #'
 #' @returns A list class object.
 #' * `teq`: numeric value of the TEQ.
@@ -42,24 +42,22 @@
 #'   summarise(teq = calculate_teq(obs = results, cen = nondetects, casrn = congener)$teq)
 #'
 
-calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
+calculate_teq <- function(obs, cen, casrn, sigfig = 4, mesasge = TRUE) {
 
-  #warnings
-  if(warnings == TRUE) {
-    warning(paste("This function is for dioxin and dioxin-like compounds only.",
-                  "TEQs should be compared as to 2,3,7,8-tetrachlorodibenzo-p-dioxin (2,3,7,8-TCDD).",
-                  "Note: specific dioxins should be calculated individually with calculate_epc() along with calculate_teq().",
-                  "Namely:",
-                  "*2,3,7,8-Tetrachloro dibenzo-p-dioxin (CASRN: 1746-01-6)",
-                  "*1,2,3,6,7,8-Hexachloro dibenzo-p-dioxin (CASRN: 57653-85-7)",
-                  "*1,2,3,7,8,9-Hexachloro dibenzo-p-dioxin (CASRN: 19408-74-3) ",
-                  "*2,3,4,7,8-Pentachloro dibenzofuran (CASRN: 57117-31-4)",
+  #mesasge
+  if(mesasge == TRUE) {
+    message(paste("This function is for dioxin and dioxin-like compounds only.\n",
+                  "TEQs should be compared as to 2,3,7,8-tetrachlorodibenzo-p-dioxin (2,3,7,8-TCDD) (CAS-RN: 1746-01-6).\n",
+                  "Note: specific dioxins should be calculated individually with calculate_epc() and with calculate_teq(), namely:",
+                  " * 2,3,7,8-Tetrachloro dibenzo-p-dioxin (CASRN: 1746-01-6)",
+                  " * 1,2,3,6,7,8-Hexachloro dibenzo-p-dioxin (CASRN: 57653-85-7)",
+                  " * 1,2,3,7,8,9-Hexachloro dibenzo-p-dioxin (CASRN: 19408-74-3) ",
+                  " * 2,3,4,7,8-Pentachloro dibenzofuran (CASRN: 57117-31-4)",
                   sep = "\n"))
   }
 
   #format tef_congener
-  tef_data <- jspr::tef_congener |>
-    dplyr::mutate(casrn = fix_casrn(casrn))
+  tef_data <- jspr::tef_congener
 
 
   # check cas for dioxins
@@ -80,7 +78,7 @@ calculate_teq <- function(obs, cen, casrn, sigfig = 4, warnings = TRUE) {
   # Only do the calculation if there's something besides just dioxin present
   if(dioxin_present) {
 
-    if(all(casrn == "001746-01-6")) {
+    if(all(casrn == "1746-01-6")) {
 
       df$qcontrol <- message_breaks(df$qcontrol, "The imported data contained only 2,3,7,8-TCDD.")
 

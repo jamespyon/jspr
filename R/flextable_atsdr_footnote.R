@@ -143,9 +143,9 @@ flextable_atsdr_footnote <- function(flextable, data) {
       if(grepl("\\*", atsdr_footnote_symbol(fn_index))) { #do not superscript star symbol
 
         temp <- flextable::append_chunks(temp,
-                                         j = column_info$j,
-                                         part = "header",
-                                         atsdr_footnote_symbol(fn_index))
+                                 j = column_info$j,
+                                 part = "header",
+                                 atsdr_footnote_symbol(fn_index))
 
       } else {
 
@@ -236,3 +236,4 @@ flextable_atsdr_footnote <- function(flextable, data) {
   return(output)
 
 }
+

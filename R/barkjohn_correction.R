@@ -4,7 +4,7 @@
 #'
 #' @param x A value representing PurpleAir PM2.5 output.
 #' @param rh A value representing PurpleAir relative humidity.
-#' @param warnings A logical value. Change to remove warnings.
+#' @param message A logical value. Change to remove message.
 #'
 #' @returns A numeric class object
 #'
@@ -14,11 +14,11 @@
 #' barkjohn_correction(0.5, 30)
 #'
 
-barkjohn_correction <- function(x, rh, warnings = TRUE) {
+barkjohn_correction <- function(x, rh, message = TRUE) {
 
   # warning
-  if(warnings == TRUE) {
-    warning(paste("Relative Humidity units should be in %.",
+  if(message == TRUE) {
+    message(paste("Relative Humidity units should be in %.",
                   "PM2.5 units should be in ug/m3.",
                   sep = "\n"))
   }

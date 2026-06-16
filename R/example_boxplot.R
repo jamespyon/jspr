@@ -11,7 +11,7 @@
 #' @param text.color A character string denoting a color for the text generated.
 #' @param title A character string for an optional title.
 #' @param caption A character string for an optional caption.
-#' @param warnings Logical. Do you want warnings?
+#' @param message Logical. Do you want message?
 #'
 #' @returns A ggplot class object.
 #' @importFrom rlang .data
@@ -21,11 +21,11 @@
 #' example_boxplot()
 #'
 
-example_boxplot <- function(x = c("rnorm", "rlnorm", "rexp"), add.mean = TRUE, mean.shape = 10, text.size = 4, bracket.size = 1, plot.color = "black", bracket.color = "darkgray", text.color = "black", title = "", caption = "", warnings = TRUE) {
+example_boxplot <- function(x = c("rnorm", "rlnorm", "rexp"), add.mean = TRUE, mean.shape = 10, text.size = 4, bracket.size = 1, plot.color = "black", bracket.color = "darkgray", text.color = "black", title = "", caption = "", message = TRUE) {
 
-  # warnings
-  if(warnings == TRUE) {
-    warning(paste("This function changes Global Settings.",
+  # message
+  if(message == TRUE) {
+    message(paste("This function changes Global Settings.",
                   sep = "\n"))
   }
 
