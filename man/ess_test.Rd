@@ -10,7 +10,7 @@ ess_test(
   alternative = c("two.sided", "less", "greater"),
   conf.level = 0.95,
   method = c("basic", "hsdda"),
-  warnings = TRUE
+  message = TRUE
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ ess_test(
 
 \item{method}{A character string for method to calculate the factor equation for the effective samples sizes. Only "basic" and "hsdda" are available.}
 
-\item{warnings}{A logical value. Change to remove warnings.}
+\item{message}{A logical value. Change to remove message.}
 }
 \value{
 A list class object (trying to figure out attributes to make my own class):

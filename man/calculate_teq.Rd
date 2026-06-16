@@ -4,7 +4,7 @@
 \alias{calculate_teq}
 \title{Calculate Toxic Equivalents (TEQ) for Dioxin and Dioxin-Like Compounds}
 \usage{
-calculate_teq(obs, cen, casrn, sigfig = 4, warnings = TRUE)
+calculate_teq(obs, cen, casrn, sigfig = 4, mesasge = TRUE)
 }
 \arguments{
 \item{obs}{A numeric vector}
@@ -15,7 +15,7 @@ calculate_teq(obs, cen, casrn, sigfig = 4, warnings = TRUE)
 
 \item{sigfig}{A numeric value for the number of significant figures for the outputs of the function. Default is 4.}
 
-\item{warnings}{Logical. Do you want warnings?}
+\item{mesasge}{Logical. Do you want mesasge?}
 }
 \value{
 A list class object.

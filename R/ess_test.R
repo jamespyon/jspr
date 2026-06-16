@@ -7,7 +7,7 @@
 #' @param alternative A character string for alternative hypothesis. Can be either "two.sided", "greater", or "less". Default is "two.sided".
 #' @param conf.level A numeric value. For confidence level of the interval.
 #' @param method A character string for method to calculate the factor equation for the effective samples sizes. Only "basic" and "hsdda" are available.
-#' @param warnings A logical value. Change to remove warnings.
+#' @param message A logical value. Change to remove message.
 #'
 #' @returns A list class object (trying to figure out attributes to make my own class):
 #' * `statistic`: the t-statistic.
@@ -30,11 +30,11 @@
 #' x <- rnorm(10, 0, 5)
 #' ess_test(x)
 
-ess_test <- function(x, y = NULL, alternative = c("two.sided", "less", "greater"), conf.level = 0.95, method = c("basic", "hsdda"), warnings = TRUE) {
+ess_test <- function(x, y = NULL, alternative = c("two.sided", "less", "greater"), conf.level = 0.95, method = c("basic", "hsdda"), message = TRUE) {
 
-  # warnings
-  if(warnings == TRUE) {
-    warning(paste("Only use function if you know your data has significant autocorrelation.",
+  # message
+  if(message == TRUE) {
+    message(paste("Only use function if you know your data has significant autocorrelation.",
                   "You can check with stats::acf().",
                   sep = "\n"))
   }

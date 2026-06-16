@@ -11,7 +11,7 @@ calculate_epc(
   sigfig = 4,
   testForNormal = TRUE,
   useDefaultSeed = TRUE,
-  warnings = TRUE
+  message = TRUE
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ calculate_epc(
 
 \item{useDefaultSeed}{Logical. The Default TRUE uses custom seed similar to EPCTool, which is sum of all concentrations. For testing, either upload separate files of individual data subsets to EPCTool or sum all obs in clean dataset and set to seed.}
 
-\item{warnings}{Logical. Do you want warnings?}
+\item{message}{Logical. Do you want message?}
 }
 \value{
 A list class object.
@@ -54,10 +54,13 @@ A list class object.
 Calculate exposure point concentrations according to ATSDR Division of Community Health Investigations Exposure Point Concentration Guidance for Discrete Sampling (2023). Last updated 08/18/2025.
 }
 \examples{
+#example of individual inputs
 results <- rexp(n = 16, rate = 1)
 nondetects <- results<0.5
+
 calculate_epc(obs = results, cen = nondetects)
 
+#example of dplyr verbs with dataframe
 library(tidyverse)
 
 data.frame(results, nondetects, group = rep(c("A", "B"), 8)) |>

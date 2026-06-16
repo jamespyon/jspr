@@ -8,7 +8,7 @@
 #' @param sigfig A numeric value for the number of significant figures for the outputs of the function. Default is 4.
 #' @param testForNormal Logical. If you want to test for normal distribution of your obs. Default is TRUE
 #' @param useDefaultSeed Logical. The Default TRUE uses custom seed similar to EPCTool, which is sum of all concentrations. For testing, either upload separate files of individual data subsets to EPCTool or sum all obs in clean dataset and set to seed.
-#' @param warnings Logical. Do you want warnings?
+#' @param message Logical. Do you want message?
 #'
 #' @returns A list class object.
 #' * `function_used`: the character string representing the type of calculation used for the EPC.
@@ -31,10 +31,13 @@
 #' @export
 #'
 #' @examples
+#' #example of individual inputs
 #' results <- rexp(n = 16, rate = 1)
 #' nondetects <- results<0.5
+#'
 #' calculate_epc(obs = results, cen = nondetects)
 #'
+#' #example of dplyr verbs with dataframe
 #' library(tidyverse)
 #'
 #' data.frame(results, nondetects, group = rep(c("A", "B"), 8)) |>
@@ -42,16 +45,16 @@
 #'   summarise(epc = calculate_epc(obs = results, cen = nondetects)$epc)
 #'
 
-calculate_epc <- function(obs, cen, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE, warnings = TRUE) {
+calculate_epc <- function(obs, cen, conf.level = 0.90, sigfig = 4, testForNormal = TRUE, useDefaultSeed = TRUE, message = TRUE) {
 
-  #warnings
-  if(warnings == TRUE) {
-    warning(paste("This function should not be used for the following:",
-                  " *asbestos/lead.",
-                  " *radiological contaminants.",
-                  " *dioxins/polycyclic aromatic hydrocarbons (PAHs).",
-                  " *non-discrete sampling data.",
-                  " *dependent data.",
+  #message
+  if(message == TRUE) {
+    message(paste("This function should not be used for the following:",
+                  " * asbestos/lead.",
+                  " * radiological contaminants.",
+                  " * dioxins/polycyclic aromatic hydrocarbons (PAHs).",
+                  " * non-discrete sampling data.",
+                  " * dependent data.",
                   sep = "\n"))
   }
 
