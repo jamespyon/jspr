@@ -7,7 +7,7 @@
 show_recommended_cv(
   casrn,
   media = c("drinking_water", "shower", "soil", "air", "svi_soil_gas", "svi_groundwater"),
-  unit = c("µg/m3", "ug/m3", "ppb", "ppm")
+  unit = c("μg/m3", "µg/m3", "ug/m3", "ppb", "ppm")
 )
 }
 \arguments{

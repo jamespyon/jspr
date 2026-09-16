@@ -72,3 +72,15 @@
 #' }
 #'
 "atsdr_recommended_cv"
+
+#' PHAST Recommended CVs
+#'
+#' PHAST Recommended CVs
+#'
+#' @format A 508 × 2 data frame:
+#' \describe{
+#'   \item{analyte}{Contaminant Name}
+#'   \item{cas_rn}{Contaminant CAS-Reference Number}
+#' }
+#'
+"casrn_data"

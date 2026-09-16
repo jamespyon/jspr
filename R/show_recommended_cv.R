@@ -24,7 +24,7 @@
 #'                     media = "air", unit = "ppb")
 #'
 
-show_recommended_cv <- function(casrn, media = c("drinking_water", "shower", "soil", "air", "svi_soil_gas", "svi_groundwater"), unit = c("\u00B5g/m3", "ug/m3", "ppb", "ppm")) {
+show_recommended_cv <- function(casrn, media = c("drinking_water", "shower", "soil", "air", "svi_soil_gas", "svi_groundwater"), unit = c("\u03BCg/m3", "\u00B5g/m3", "ug/m3", "ppb", "ppm")) {
 
   #fix casrn
   casrn <- fix_casrn(casrn, format = "xx-xx-x")
@@ -37,10 +37,10 @@ show_recommended_cv <- function(casrn, media = c("drinking_water", "shower", "so
   }
 
   #check unit
-  if(identical(unit, c("\u00B5g/m3", "ug/m3", "ppb", "ppm"))) {
+  if(identical(unit, c("\u03BCg/m3", "\u00B5g/m3", "ug/m3", "ppb", "ppm"))) {
     unit <- NULL
   } else {
-    if(unit == "ug/m3") {unit <- "\u00B5g/m3"}
+    if(unit == "ug/m3" | unit == "\u00B5g/m3") {unit <- "\u03BCg/m3"}
     unit <- match.arg(unit)
   }
 
